@@ -10,8 +10,10 @@ import TheorySelectionCalculator from './calculators/waves/theory-selection/Theo
 import RemainingCalculator, { type RemainingId } from './calculators/RemainingCalculator.vue'
 import HomePage from './pages/HomePage.vue'
 import ResourcesPage from './pages/ResourcesPage.vue'
+import ExtremeWavesCalculator from './calculators/waves/extreme-waves/ExtremeWavesCalculator.vue'
+import EurotopCalculator from './calculators/engineering/eurotop/EurotopCalculator.vue'
 
-type CalculatorId = 'home' | 'resources' | 'theory-selection' | 'linear-wave' | 'shoaling-refraction' | 'stokes-drift' | 'wind-holthuijsen' | 'wind-carter' | 'cyclone-waves' | RemainingId
+type CalculatorId = 'home' | 'resources' | 'theory-selection' | 'linear-wave' | 'extreme-waves' | 'shoaling-refraction' | 'stokes-drift' | 'wind-holthuijsen' | 'wind-carter' | 'cyclone-waves' | 'eurotop-smooth' | 'eurotop-rubble' | 'eurotop-vertical' | RemainingId
 const activeCalculator = ref<CalculatorId>('home')
 const menusSuppressed = ref(false)
 
@@ -36,6 +38,7 @@ function selectCalculator(id: CalculatorId) {
         <div class="nav-dropdown">
           <button type="button" @click="selectCalculator('linear-wave')">Linear Wave Theory</button>
           <button type="button" @click="selectCalculator('theory-selection')">Nonlinear Regular Wave Theory</button>
+          <button type="button" @click="selectCalculator('extreme-waves')">Extreme Individual Waves (Stive)</button>
           <button type="button" @click="selectCalculator('shoaling-refraction')">Wave Shoaling and Refraction</button>
           <button type="button" @click="selectCalculator('stokes-drift')">Stokes Drift</button>
           <button type="button" @click="selectCalculator('wind-holthuijsen')">Wind Waves (Holthuijsen, 2006)</button>
@@ -57,7 +60,12 @@ function selectCalculator(id: CalculatorId) {
       <div class="nav-menu"><button type="button">Water Level <span>▾</span></button><div class="nav-dropdown"><button type="button" @click="selectCalculator('wind-setup')">Wind Setup in an Enclosed Water Body</button></div></div>
       <div class="nav-menu"><button type="button">Engineering <span>▾</span></button><div class="nav-dropdown">
         <button type="button" @click="selectCalculator('rock-sizing')">Rock Sizing for Sea Dikes and Revetments</button>
-        <button type="button" @click="selectCalculator('overtopping')">Runup/Overtopping of Revetments</button>
+        <div class="nav-folder"><button type="button">EurOtop 2018 <span>▸</span></button><div class="nav-subdropdown">
+          <button type="button" @click="selectCalculator('eurotop-smooth')">Dikes and Embankment Seawalls</button>
+          <button type="button" @click="selectCalculator('eurotop-rubble')">Armoured Rubble Slopes and Mounds</button>
+          <button type="button" @click="selectCalculator('eurotop-vertical')">Vertical and Steep Walls</button>
+        </div></div>
+        <button type="button" @click="selectCalculator('overtopping')">Runup and Overtopping of Revetments</button>
         <button type="button" @click="selectCalculator('submerged-breakwater')">Transmission over Submerged Breakwater</button>
         <button type="button" @click="selectCalculator('reef-balls')">Transmission over Reef Balls</button>
       </div></div>
@@ -70,11 +78,15 @@ function selectCalculator(id: CalculatorId) {
     <ResourcesPage v-else-if="activeCalculator === 'resources'" />
     <TheorySelectionCalculator v-else-if="activeCalculator === 'theory-selection'" />
     <LinearWaveCalculator v-else-if="activeCalculator === 'linear-wave'" />
+    <ExtremeWavesCalculator v-else-if="activeCalculator === 'extreme-waves'" />
     <ShoalingRefractionCalculator v-else-if="activeCalculator === 'shoaling-refraction'" />
     <StokesDriftCalculator v-else-if="activeCalculator === 'stokes-drift'" />
     <WindHolthuijsenCalculator v-else-if="activeCalculator === 'wind-holthuijsen'" />
     <WindCarterCalculator v-else-if="activeCalculator === 'wind-carter'" />
     <CycloneWavesCalculator v-else-if="activeCalculator === 'cyclone-waves'" />
+    <EurotopCalculator v-else-if="activeCalculator === 'eurotop-smooth'" family="smooth" />
+    <EurotopCalculator v-else-if="activeCalculator === 'eurotop-rubble'" family="rubble" />
+    <EurotopCalculator v-else-if="activeCalculator === 'eurotop-vertical'" family="vertical" />
     <RemainingCalculator v-else :key="activeCalculator" :id="activeCalculator as RemainingId" />
   </main>
 

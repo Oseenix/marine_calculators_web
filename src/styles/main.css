@@ -19,6 +19,10 @@ button, input, select { font: inherit; }
 .menus-suppressed .nav-dropdown { display: none !important; }
 .nav-dropdown button { width: 100%; padding: 10px 15px; border: 0; color: #333; background: white; cursor: pointer; text-align: left; font-size: .82rem; }
 .nav-dropdown button:hover, .nav-dropdown button:focus { background: #eee; }
+.nav-folder { position: relative; }
+.nav-folder > button { display: flex; width: 100%; justify-content: space-between; padding: 10px 15px; border: 0; color: #333; background: #fff; cursor: pointer; text-align: left; font-size: .82rem; }
+.nav-subdropdown { position: absolute; z-index: 21; top: -6px; left: 100%; min-width: 270px; display: none; padding: 5px 0; background: #fff; border: 1px solid #ccc; box-shadow: 0 5px 12px rgb(0 0 0 / 12%); }
+.nav-folder:hover .nav-subdropdown, .nav-folder:focus-within .nav-subdropdown { display: block; }
 .calculator { max-width: 1540px; margin: 0 auto; padding: 38px 24px 64px; }
 .calculator-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
 .excel-download { flex: 0 0 auto; padding: 9px 13px; border: 1px solid #267a50; border-radius: 2px; color: #fff; background: #2f8f5f; cursor: pointer; font-size: .8rem; }
@@ -120,6 +124,14 @@ input:focus, select:focus { outline: 2px solid rgb(0 123 255 / 18%); border-colo
 .profile-card-body { padding: 15px 18px 9px; font-size: .86rem; line-height: 1.6; }
 .profile-card-body p { margin: 0 0 12px; }
 .profile-card-body a, .resources-page a { color: #176a94; }
+.eurotop-section { margin: 5px 0 0; color: #555; font-size: .82rem; }
+.check-label { display: flex !important; align-items: center; gap: 8px; padding-bottom: 0 !important; }
+.check-label input { width: auto; margin: 0; }
+.eurotop-graphical { display: grid; grid-template-columns: minmax(420px,1.6fr) minmax(230px,.7fr); gap: 24px; }
+.structure-diagram { display: block; width: 100%; height: auto; max-height: 230px; object-fit: contain; border: 1px solid #222; background: #fff; }
+.applicability-ok, .applicability-warning { margin: 0 11px 14px; padding: 9px 10px; font-size: .75rem; line-height: 1.4; }
+.applicability-ok { border-left: 3px solid #2f8f5f; background: #edf8f1; }
+.applicability-warning { border-left: 3px solid #c83f34; background: #fff0ee; }
 .resources-page .page-intro { margin: 8px 0 24px; color: #555; font-size: .9rem; }
 .resource-list { display: grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 22px; max-width: 980px; }
 .resource-card { padding: 18px; border: 1px solid #338fbd; border-top: 40px solid #3c94bf; background: #fff; }
@@ -142,6 +154,8 @@ footer p { margin: 0; }
   .charts-panel { grid-column: auto; }
   .select-row { padding: 5px 0 15px; }
   .resource-list { grid-template-columns: 1fr; }
+  .eurotop-graphical { grid-template-columns: 1fr; }
+  .nav-subdropdown { position: static; min-width: 245px; border-width: 1px 0 0; box-shadow: none; }
   .profile-card-header { align-items: flex-start; }
   footer { flex-direction: column; }
 }
