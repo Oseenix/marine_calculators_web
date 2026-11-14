@@ -32,7 +32,7 @@ const chartData=computed(()=>[
         <div><dt>Deep-Water Rayleigh H0.1%</dt><dd>{{ result.rayleighH01.toFixed(2) }} m</dd></div>
       </dl></article>
       <article class="panel charts-panel"><div class="panel-title graphical-title"><h2>Graphical</h2></div><div class="graphical-body">
-        <PlotlyChart :data="chartData" :layout="{xaxis:{title:{text:'Relative wave height, Hm0/h'}},yaxis:{title:{text:'Extreme wave height / Hm0'}},legend:{orientation:'h',y:-.22},margin:{b:85}}" />
+        <PlotlyChart :data="chartData" :layout="{xaxis:{title:{text:'Relative wave height, Hm0/h'}},yaxis:{title:{text:'Extreme wave height / Hm0'}},legend:{orientation:'h',x:.5,xanchor:'center',y:1.16},margin:{t:58,b:52}}" />
       </div></article>
     </div>
     <article class="background-panel"><div class="background-title"><h2>Background and method choice</h2><span>−</span></div><div class="background-body">
