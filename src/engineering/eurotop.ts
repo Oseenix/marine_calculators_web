@@ -11,6 +11,9 @@ export interface EurotopResult {
   xi?: number
   gammaFModified?: number
   impulseParameter?: number
+  runup2?: number
+  overtoppingProbability: number
+  overtoppingProbabilityEquation: string
   applicable: boolean
   warnings: string[]
 }
@@ -56,9 +59,13 @@ export function smoothOvertopping(hm0: number, period: number, rc: number, cotAl
   const qMax = aMax * Math.exp(-((bMax * rc / (hm0 * gammaF * gammaBeta)) ** 1.3))
   const combinedFactor = gammaB * gammaF * gammaBeta * gammaV
   const warnings: string[] = []
+  const runupBreaking = (design ? 1.75 : 1.65) * gammaB * gammaF * gammaBeta * xi * hm0
+  const runupMaximum = (design ? 1.07 : 1) * gammaF * gammaBeta * (4 - 1.5 / Math.sqrt(gammaB * xi)) * hm0
+  const runup2 = Math.min(runupBreaking, runupMaximum)
+  const overtoppingProbability = Math.exp(-((Math.sqrt(-Math.log(0.02)) * rc / runup2) ** 2))
   if (cotAlpha < 2) warnings.push('The general gentle-slope method is intended primarily for slopes 1:2 and gentler.')
   if (combinedFactor < 0.4) warnings.push('The combined influence factor is below 0.4; EurOtop recommends further research in this range.')
-  return result(Math.min(qBreak, qMax), { xi, regime: qBreak <= qMax ? 'Breaking-wave equation' : 'Non-breaking maximum', equations: design ? '5.12 / 5.13' : '5.10 / 5.11', applicable: warnings.length === 0, warnings }, hm0)
+  return result(Math.min(qBreak, qMax), { xi, runup2, overtoppingProbability, overtoppingProbabilityEquation: '5.56', regime: qBreak <= qMax ? 'Breaking-wave equation' : 'Non-breaking maximum', equations: design ? '5.12 / 5.13' : '5.10 / 5.11', applicable: warnings.length === 0, warnings }, hm0)
 }
 
 export function rubbleOvertopping(hm0: number, period: number, rc: number, cotAlpha: number, gammaF: number, gammaBeta: number, approach: EurotopApproach, permeableCore: boolean): EurotopResult {
@@ -69,9 +76,17 @@ export function rubbleOvertopping(hm0: number, period: number, rc: number, cotAl
   const design = approach === 'design'
   const qNd = (design ? 0.1035 : 0.09) * Math.exp(-(((design ? 1.35 : 1.5) * rc / (hm0 * gammaFModified * gammaBeta)) ** 1.3))
   const warnings: string[] = []
+  let gammaFRunup = gammaF
+  if (xi > 1.8) gammaFRunup = gammaF + (Math.min(xi, 10) - 1.8) * (1 - gammaF) / 8.2
+  const runupBreaking = (design ? 1.75 : 1.65) * gammaF * gammaBeta * xi * hm0
+  const runupMaximum = (design ? 1.07 : 1) * gammaFRunup * gammaBeta * (4 - 1.5 / Math.sqrt(xi)) * hm0
+  const coreLimit = (design ? (permeableCore ? 2.14 : 3.21) : (permeableCore ? 2 : 3)) * hm0
+  const runup2 = Math.min(runupBreaking, runupMaximum, coreLimit)
+  const overtoppingProbability = Math.exp(-((Math.sqrt(-Math.log(0.02)) * rc / runup2) ** 2))
   if (cotAlpha < 1.333 || cotAlpha > 2) warnings.push('The steep armoured-slope method is intended for slopes from about 1:1.33 to 1:2.')
   if (xi < 2.8 || xi > 4.5) warnings.push('The Table 6.2 roughness factors were derived mainly for breaker parameters between 2.8 and 4.5.')
-  return result(qNd, { xi, gammaFModified, regime: xi > 5 ? 'Steep armoured slope with modified roughness' : 'Steep armoured slope', equations: design ? '6.6 (and 6.7 where ξ > 5)' : '6.5 (and 6.7 where ξ > 5)', applicable: warnings.length === 0, warnings }, hm0)
+  warnings.push('EurOtop Equation 6.3 gives an upper estimate of the percentage of waves that actually overtop a rubble-mound crest.')
+  return result(qNd, { xi, gammaFModified, runup2, overtoppingProbability, overtoppingProbabilityEquation: '6.3', regime: xi > 5 ? 'Steep armoured slope with modified roughness' : 'Steep armoured slope', equations: design ? '6.6 (and 6.7 where ξ > 5)' : '6.5 (and 6.7 where ξ > 5)', applicable: warnings.length === 1, warnings }, hm0)
 }
 
 export function verticalOvertopping(hm0: number, period: number, rc: number, depth: number, influencingForeshore: boolean, approach: EurotopApproach): EurotopResult {
@@ -103,5 +118,8 @@ export function verticalOvertopping(hm0: number, period: number, rc: number, dep
     regime = 'Impulsive'
   }
   const warnings = depth <= 0 ? ['Water depth at the wall toe must be positive.'] : []
-  return result(qNd, { impulseParameter, regime, equations, applicable: warnings.length === 0, warnings }, hm0)
+  const rayleighProbability = Math.exp(-1.21 * (rc / hm0) ** 2)
+  const impulsiveProbability = 0.024 * impulseParameter * (rc / hm0) ** -1
+  const overtoppingProbability = Math.min(1, influencingForeshore && impulseParameter <= 0.23 ? Math.max(rayleighProbability, impulsiveProbability) : rayleighProbability)
+  return result(qNd, { impulseParameter, overtoppingProbability, overtoppingProbabilityEquation: influencingForeshore && impulseParameter <= 0.23 ? '7.25' : '7.24', regime, equations, applicable: warnings.length === 0, warnings }, hm0)
 }

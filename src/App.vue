@@ -12,8 +12,9 @@ import HomePage from './pages/HomePage.vue'
 import ResourcesPage from './pages/ResourcesPage.vue'
 import ExtremeWavesCalculator from './calculators/waves/extreme-waves/ExtremeWavesCalculator.vue'
 import EurotopCalculator from './calculators/engineering/eurotop/EurotopCalculator.vue'
+import BattjesGroenendijkCalculator from './calculators/waves/battjes-groenendijk/BattjesGroenendijkCalculator.vue'
 
-type CalculatorId = 'home' | 'resources' | 'theory-selection' | 'linear-wave' | 'extreme-waves' | 'shoaling-refraction' | 'stokes-drift' | 'wind-holthuijsen' | 'wind-carter' | 'cyclone-waves' | 'eurotop-smooth' | 'eurotop-rubble' | 'eurotop-vertical' | RemainingId
+type CalculatorId = 'home' | 'resources' | 'theory-selection' | 'linear-wave' | 'extreme-waves' | 'battjes-groenendijk' | 'shoaling-refraction' | 'stokes-drift' | 'wind-holthuijsen' | 'wind-carter' | 'cyclone-waves' | 'eurotop-smooth' | 'eurotop-rubble' | 'eurotop-vertical' | RemainingId
 const activeCalculator = ref<CalculatorId>('home')
 const menusSuppressed = ref(false)
 
@@ -39,6 +40,7 @@ function selectCalculator(id: CalculatorId) {
           <button type="button" @click="selectCalculator('linear-wave')">Linear Wave Theory</button>
           <button type="button" @click="selectCalculator('theory-selection')">Nonlinear Regular Wave Theory</button>
           <button type="button" @click="selectCalculator('extreme-waves')">Extreme Individual Waves (Stive)</button>
+          <button type="button" @click="selectCalculator('battjes-groenendijk')">Shallow-Water Wave Heights (Battjes–Groenendijk)</button>
           <button type="button" @click="selectCalculator('shoaling-refraction')">Wave Shoaling and Refraction</button>
           <button type="button" @click="selectCalculator('stokes-drift')">Stokes Drift</button>
           <button type="button" @click="selectCalculator('wind-holthuijsen')">Wind Waves (Holthuijsen, 2006)</button>
@@ -79,6 +81,7 @@ function selectCalculator(id: CalculatorId) {
     <TheorySelectionCalculator v-else-if="activeCalculator === 'theory-selection'" />
     <LinearWaveCalculator v-else-if="activeCalculator === 'linear-wave'" />
     <ExtremeWavesCalculator v-else-if="activeCalculator === 'extreme-waves'" />
+    <BattjesGroenendijkCalculator v-else-if="activeCalculator === 'battjes-groenendijk'" />
     <ShoalingRefractionCalculator v-else-if="activeCalculator === 'shoaling-refraction'" />
     <StokesDriftCalculator v-else-if="activeCalculator === 'stokes-drift'" />
     <WindHolthuijsenCalculator v-else-if="activeCalculator === 'wind-holthuijsen'" />
