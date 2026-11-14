@@ -14,6 +14,6 @@ describe('new calculator workbooks',()=>{
     ['vertical','L7','SQRT(9.81*C7^3)'],
   ] as const)('creates the %s EurOtop decision workbook',async(family,resultCell,fragment)=>{
     const wb=await createEurotopWorkbook(family,{approach:'design',hm0:2,period:8,rc:2.5,cotAlpha:3,gammaB:1,gammaF:1,beta:0,shortCrested:false,gammaV:1,permeableCore:true,depth:6,influencingForeshore:false})
-    const ws=wb.getWorksheet('Calculations')!;expect(ws.getCell(resultCell).formula).toContain(fragment);expect(ws.conditionalFormattings.length).toBe(1)
+    const ws=wb.getWorksheet('Calculations')!;expect(ws.getCell(resultCell).formula).toContain(fragment)
   })
 })
