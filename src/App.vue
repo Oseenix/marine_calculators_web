@@ -39,8 +39,8 @@ function selectCalculator(id: CalculatorId) {
         <div class="nav-dropdown">
           <button type="button" @click="selectCalculator('linear-wave')">Linear Wave Theory</button>
           <button type="button" @click="selectCalculator('theory-selection')">Nonlinear Regular Wave Theory</button>
-          <button type="button" @click="selectCalculator('extreme-waves')">Extreme Individual Waves (Stive)</button>
-          <button type="button" @click="selectCalculator('battjes-groenendijk')">Shallow-Water Wave Heights (Battjes–Groenendijk)</button>
+          <button type="button" @click="selectCalculator('extreme-waves')">Extreme Individual Waves (Stive, 1986)</button>
+          <button type="button" @click="selectCalculator('battjes-groenendijk')">Shallow-Water Wave Heights (Battjes–Groenendijk, 2000)</button>
           <button type="button" @click="selectCalculator('shoaling-refraction')">Wave Shoaling and Refraction</button>
           <button type="button" @click="selectCalculator('stokes-drift')">Stokes Drift</button>
           <button type="button" @click="selectCalculator('wind-holthuijsen')">Wind Waves (Holthuijsen, 2006)</button>
@@ -80,16 +80,16 @@ function selectCalculator(id: CalculatorId) {
     <ResourcesPage v-else-if="activeCalculator === 'resources'" />
     <TheorySelectionCalculator v-else-if="activeCalculator === 'theory-selection'" />
     <LinearWaveCalculator v-else-if="activeCalculator === 'linear-wave'" />
-    <ExtremeWavesCalculator v-else-if="activeCalculator === 'extreme-waves'" />
+    <ExtremeWavesCalculator v-else-if="activeCalculator === 'extreme-waves'" @navigate="selectCalculator" />
     <BattjesGroenendijkCalculator v-else-if="activeCalculator === 'battjes-groenendijk'" />
     <ShoalingRefractionCalculator v-else-if="activeCalculator === 'shoaling-refraction'" />
     <StokesDriftCalculator v-else-if="activeCalculator === 'stokes-drift'" />
     <WindHolthuijsenCalculator v-else-if="activeCalculator === 'wind-holthuijsen'" />
     <WindCarterCalculator v-else-if="activeCalculator === 'wind-carter'" />
     <CycloneWavesCalculator v-else-if="activeCalculator === 'cyclone-waves'" />
-    <EurotopCalculator v-else-if="activeCalculator === 'eurotop-smooth'" family="smooth" />
-    <EurotopCalculator v-else-if="activeCalculator === 'eurotop-rubble'" family="rubble" />
-    <EurotopCalculator v-else-if="activeCalculator === 'eurotop-vertical'" family="vertical" />
+    <EurotopCalculator v-else-if="activeCalculator === 'eurotop-smooth'" key="eurotop-smooth" family="smooth" />
+    <EurotopCalculator v-else-if="activeCalculator === 'eurotop-rubble'" key="eurotop-rubble" family="rubble" />
+    <EurotopCalculator v-else-if="activeCalculator === 'eurotop-vertical'" key="eurotop-vertical" family="vertical" />
     <RemainingCalculator v-else :key="activeCalculator" :id="activeCalculator as RemainingId" />
   </main>
 

@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref } from 'vue'
+import renderMathInElement from 'katex/contrib/auto-render'
+import 'katex/dist/katex.min.css'
 import PlotlyChart from '../../../components/PlotlyChart.vue'
 import { linspace } from '../../../engineering/numeric'
 import { obliquityFactor, roughnessCatalogue, rubbleOvertopping, smoothOvertopping, verticalOvertopping, type EurotopApproach, type EurotopFamily } from '../../../engineering/eurotop'
@@ -26,6 +28,7 @@ const chartData=computed(()=>[
 const varyLabel=computed(()=>vary.value==='rc'?'Crest freeboard, Rc (m)':vary.value==='hm0'?'Wave height, Hm0 (m)':'Wave period, Tm-1,0 (s)')
 const armour=ref('Rock, 2 layers, permeable core')
 function setArmour(){values.gammaF=roughnessCatalogue[armour.value]}
+onMounted(async()=>{await nextTick();const el=document.querySelector('.eurotop-background');if(el)renderMathInElement(el as HTMLElement,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})})
 </script>
 
 <template>
@@ -33,54 +36,81 @@ function setArmour(){values.gammaF=roughnessCatalogue[armour.value]}
     <div class="calculator-heading"><div><h1>{{ title }}</h1><p class="eurotop-section">EurOtop 2018, {{ section }}</p></div><button class="excel-download" type="button" @click="downloadEurotopWorkbook(props.family,values)">Download Excel template</button></div>
     <div class="calculator-grid">
       <article class="panel input-panel"><div class="panel-title input-title"><h2>Input</h2></div>
-        <label>Calculation Approach<select v-model="values.approach"><option value="design">Design / assessment</option><option value="mean">Mean value</option></select></label>
-        <label>Spectral Wave Height, Hm0 (m)<input v-model.number="values.hm0" type="number" min=".05" step="any" /></label>
-        <label>Spectral Period, Tm-1,0 (s)<input v-model.number="values.period" type="number" min=".5" step="any" /></label>
-        <label>Crest Freeboard, Rc (m)<input v-model.number="values.rc" type="number" min="0" step="any" /></label>
+        <label>Calculation Approach <button class="info-tip" type="button" data-tip="Mean-value equations represent the central empirical fit. Design/assessment equations include one standard deviation of model uncertainty and normally give a more conservative result.">i</button><select v-model="values.approach"><option value="design">Design / assessment</option><option value="mean">Mean value</option></select></label>
+        <label>Spectral Wave Height, Hm0 (m) <button class="info-tip" type="button" data-tip="The incident spectral significant wave height at the structure toe, equal to four times the square root of the zero-th spectral moment.">i</button><input v-model.number="values.hm0" type="number" min=".05" step="any" /></label>
+        <label>Spectral Period, Tm-1,0 (s) <button class="info-tip" type="button" data-tip="The spectral energy period at the structure toe. EurOtop uses it to calculate wavelength, wave steepness and the breaker parameter.">i</button><input v-model.number="values.period" type="number" min=".5" step="any" /></label>
+        <label>Crest Freeboard, Rc (m) <button class="info-tip" type="button" data-tip="Vertical distance from still water level to the level over which water must pass. Overtopping decreases rapidly as Rc increases.">i</button><input v-model.number="values.rc" type="number" min="0" step="any" /></label>
         <template v-if="family==='smooth'">
-          <label>Slope, cot α (1V:nH)<input v-model.number="values.cotAlpha" type="number" min="1.5" step="any" /></label>
-          <label>Berm Factor, γb<input v-model.number="values.gammaB" type="number" min=".4" max="1" step=".01" /></label>
-          <label>Roughness Factor, γf<input v-model.number="values.gammaF" type="number" min=".4" max="1" step=".01" /></label>
-          <label>Wall Factor, γv<input v-model.number="values.gammaV" type="number" min=".4" max="1" step=".01" /></label>
+          <label>Slope, cot α (1V:nH) <button class="info-tip" type="button" data-tip="Horizontal distance for one unit of vertical rise. A value of 3 describes a 1V:3H slope; larger values are gentler slopes.">i</button><input v-model.number="values.cotAlpha" type="number" min="1.5" step="any" /></label>
+          <label>Berm Factor, γb <button class="info-tip" type="button" data-tip="Reduction factor for the influence of a berm on run-up and overtopping. It is 1.0 where no effective berm is present.">i</button><input v-model.number="values.gammaB" type="number" min=".4" max="1" step=".01" /></label>
+          <label>Roughness Factor, γf <button class="info-tip" type="button" data-tip="Reduction factor describing energy loss caused by surface roughness. A smooth impermeable slope uses 1.0; rougher surfaces use smaller values.">i</button><input v-model.number="values.gammaF" type="number" min=".4" max="1" step=".01" /></label>
+          <label>Wall Factor, γv <button class="info-tip" type="button" data-tip="Overtopping reduction produced by a wall at the top of the slope. EurOtop applies this factor to discharge, but not to the run-up calculation.">i</button><input v-model.number="values.gammaV" type="number" min=".4" max="1" step=".01" /></label>
         </template>
         <template v-else-if="family==='rubble'">
-          <label>Armour Slope, cot α (1V:nH)<input v-model.number="values.cotAlpha" type="number" min="1.333" max="2" step=".05" /></label>
-          <label>Armour System<select v-model="armour" @change="setArmour"><option v-for="(_,name) in roughnessCatalogue" :key="name" :value="name">{{ name }}</option></select></label>
-          <label>Applied Roughness Factor, γf<input v-model.number="values.gammaF" type="number" min=".1" max="1" step=".01" /></label>
-          <label class="check-label"><input v-model="values.permeableCore" type="checkbox" /> Permeable core</label>
+          <label>Armour Slope, cot α (1V:nH) <button class="info-tip" type="button" data-tip="Horizontal distance for one unit of vertical rise. The simple steep rubble-slope equations are intended for approximately 1V:1.33H to 1V:2H.">i</button><input v-model.number="values.cotAlpha" type="number" min="1.333" max="2" step=".05" /></label>
+          <label>Armour System <button class="info-tip" type="button" data-tip="The armour type selects a representative roughness factor from EurOtop Table 6.2. Check the selected value against the actual placement, layers and core.">i</button><select v-model="armour" @change="setArmour"><option v-for="(_,name) in roughnessCatalogue" :key="name" :value="name">{{ name }}</option></select></label>
+          <label>Applied Roughness Factor, γf <button class="info-tip" type="button" data-tip="The roughness factor actually used in the calculation. It can be edited where project-specific test evidence or a different EurOtop classification is available.">i</button><input v-model.number="values.gammaF" type="number" min=".1" max="1" step=".01" /></label>
+          <label class="check-label"><input v-model="values.permeableCore" type="checkbox" /> Permeable core <button class="info-tip" type="button" data-tip="A permeable core allows internal flow and imposes a lower maximum relative run-up than an impermeable core in Equation 6.2.">i</button></label>
         </template>
         <template v-else>
-          <label>Water Depth at Wall Toe, h (m)<input v-model.number="values.depth" type="number" min=".05" step="any" /></label>
-          <label class="check-label"><input v-model="values.influencingForeshore" type="checkbox" /> Influencing foreshore</label>
+          <label>Water Depth at Wall Toe, h (m) <button class="info-tip" type="button" data-tip="Still-water depth immediately in front of the wall or toe mound. With an influencing foreshore it controls whether wave attack is impulsive.">i</button><input v-model.number="values.depth" type="number" min=".05" step="any" /></label>
+          <label class="check-label"><input v-model="values.influencingForeshore" type="checkbox" /> Influencing foreshore <button class="info-tip" type="button" data-tip="Select this when the foreshore changes the waves at the wall. The calculator then classifies attack using h²/(Hm0 Lm-1,0). Leave clear for deep water at the wall with no foreshore influence.">i</button></label>
         </template>
         <template v-if="family!=='vertical'">
-          <label>Wave Angle, β (degrees)<input v-model.number="values.beta" type="number" min="0" max="80" step="1" /></label>
-          <label class="check-label"><input v-model="values.shortCrested" type="checkbox" /> Short-crested waves</label>
+          <label>Wave Angle, β (degrees) <button class="info-tip" type="button" data-tip="Angle between the incident wave direction and a line normal to the structure. Zero degrees is perpendicular attack.">i</button><input v-model.number="values.beta" type="number" min="0" max="80" step="1" /></label>
+          <label class="check-label"><input v-model="values.shortCrested" type="checkbox" /> Short-crested waves <button class="info-tip" type="button" data-tip="Short-crested seas have directional spreading and use a less severe obliquity reduction than long-crested waves.">i</button></label>
         </template>
       </article>
       <article class="panel output-panel"><div class="panel-title output-title"><h2>Output</h2></div><dl class="results">
-        <div class="primary-result"><dt>Mean Overtopping Discharge</dt><dd>{{ (result.q*1000).toPrecision(4) }} L/s/m</dd></div>
-        <div><dt>Discharge in SI Units</dt><dd>{{ result.q.toPrecision(4) }} m³/s/m</dd></div>
-        <div><dt>Governing Regime</dt><dd>{{ result.regime }}</dd></div>
-        <div><dt>EurOtop Equation(s)</dt><dd>{{ result.equations }}</dd></div>
-        <div v-if="result.runup2!==undefined"><dt>2% Wave Run-up, Ru2%</dt><dd>{{ result.runup2.toPrecision(4) }} m</dd></div>
-        <div><dt>Waves Overtopping</dt><dd>{{ (100*result.overtoppingProbability).toPrecision(3) }}%</dd></div>
-        <div><dt>Overtopping-wave Equation</dt><dd>{{ result.overtoppingProbabilityEquation }}</dd></div>
-        <div v-if="result.xi!==undefined"><dt>Breaker Parameter, ξm-1,0</dt><dd>{{ result.xi.toFixed(2) }}</dd></div>
-        <div v-if="result.gammaFModified!==undefined"><dt>Applied Modified Roughness, γf,mod</dt><dd>{{ result.gammaFModified.toFixed(3) }}</dd></div>
-        <div v-if="result.impulseParameter!==undefined"><dt>Impulse Classifier</dt><dd>{{ result.impulseParameter.toFixed(3) }}</dd></div>
+        <div class="primary-result"><dt>Mean Overtopping Discharge <button class="info-tip" type="button" data-tip="Time-averaged water volume crossing each metre of structure crest. It does not describe the much larger short-duration discharge in an individual overtopping wave.">i</button></dt><dd>{{ (result.q*1000).toPrecision(4) }} L/s/m</dd></div>
+        <div><dt>Discharge in SI Units <button class="info-tip" type="button" data-tip="The same mean overtopping discharge expressed in cubic metres per second per metre of structure width.">i</button></dt><dd>{{ result.q.toPrecision(4) }} m³/s/m</dd></div>
+        <div><dt>Governing Regime <button class="info-tip" type="button" data-tip="The physical/equation branch selected from the current inputs. A change of regime can produce a change in the sensitivity curve.">i</button></dt><dd>{{ result.regime }}</dd></div>
+        <div><dt>EurOtop Equation(s) <button class="info-tip" type="button" data-tip="The numbered EurOtop 2018 equation or pair of equations used for the mean-discharge result.">i</button></dt><dd>{{ result.equations }}</dd></div>
+        <div v-if="result.runup2!==undefined"><dt>2% Wave Run-up, Ru2% <button class="info-tip" type="button" data-tip="Vertical run-up level above still water that is exceeded by 2% of incident waves on the seaward slope.">i</button></dt><dd>{{ result.runup2.toPrecision(4) }} m</dd></div>
+        <div><dt>Waves Overtopping <button class="info-tip" type="button" data-tip="Estimated percentage of incident waves that cross the crest. This is different from mean discharge and does not state the volume of each event.">i</button></dt><dd>{{ (100*result.overtoppingProbability).toPrecision(3) }}%</dd></div>
+        <div><dt>Overtopping-wave Equation <button class="info-tip" type="button" data-tip="The EurOtop equation used to estimate the probability or proportion of overtopping waves.">i</button></dt><dd>{{ result.overtoppingProbabilityEquation }}</dd></div>
+        <div v-if="result.xi!==undefined"><dt>Breaker Parameter, ξm-1,0 <button class="info-tip" type="button" data-tip="Also called the Iribarren or surf-similarity parameter. It combines slope and wave steepness and distinguishes plunging from surging run-up behaviour.">i</button></dt><dd>{{ result.xi.toFixed(2) }}</dd></div>
+        <div v-if="result.gammaFModified!==undefined"><dt>Applied Modified Roughness, γf,mod <button class="info-tip" type="button" data-tip="Roughness factor after the EurOtop correction for steep/surging waves and, where selected, the permeable-core limit.">i</button></dt><dd>{{ result.gammaFModified.toFixed(3) }}</dd></div>
+        <div v-if="result.impulseParameter!==undefined"><dt>Impulse Classifier <button class="info-tip" type="button" data-tip="Dimensionless h²/(Hm0 Lm-1,0). Values above 0.23 indicate non-impulsive attack; smaller values indicate increasingly impulsive breaking at the wall.">i</button></dt><dd>{{ result.impulseParameter.toFixed(3) }}</dd></div>
       </dl><div :class="result.applicable?'applicability-ok':'applicability-warning'">{{ result.applicable?'Inputs pass the automated applicability checks.':result.warnings.join(' ') }}</div><p v-if="family==='rubble'" class="method-note">Equation 6.3 is an upper estimate: run-up on the front slope is not identical to water passing the crest, particularly where a crest berm or crown wall is present.</p></article>
       <article class="panel charts-panel"><div class="panel-title graphical-title"><h2>Graphical</h2></div><div class="graphical-body eurotop-graphical">
         <PlotlyChart :data="chartData" :layout="{xaxis:{title:{text:varyLabel}},yaxis:{title:{text:'Mean discharge, q (L/s/m)'},type:'log'},showlegend:false}" />
-        <div class="select-row"><label>Vary Input<select v-model="vary"><option value="rc">Crest freeboard</option><option value="hm0">Wave height</option><option value="period">Wave period</option></select></label><img class="structure-diagram" :src="image" :alt="`${title} geometry`" /></div>
+        <div class="select-row eurotop-controls"><label>Vary Input<select v-model="vary"><option value="rc">Crest freeboard</option><option value="hm0">Wave height</option><option value="period">Wave period</option></select></label></div>
+        <figure class="structure-figure"><img class="structure-diagram" :src="image" :alt="`${title} geometry`" /><figcaption>Representative EurOtop geometry and parameter definitions.</figcaption></figure>
       </div></article>
     </div>
-    <article class="background-panel"><div class="background-title"><h2>Background, equation selection and applicability</h2><span>−</span></div><div class="background-body">
-      <template v-if="family==='smooth'"><p>The calculator evaluates the breaking-wave expression and its non-breaking maximum, then uses the lower discharge. The design approach uses Equations 5.12 and 5.13; the mean-value approach uses 5.10 and 5.11. Berm, roughness, obliquity and wall factors modify the effective freeboard.</p><p>Ru2% is calculated with Equations 5.1–5.5. Equation 5.56 then estimates the proportion of incident waves whose run-up exceeds the freeboard. The wall factor is used for discharge, but EurOtop does not apply it to run-up.</p></template>
-      <template v-else-if="family==='rubble'"><p>Equations 6.5 (mean) and 6.6 (design) apply to simple steep armoured slopes. When ξm-1,0 exceeds 5, Equation 6.7 progressively increases the effective roughness factor towards 1.0. The selected armour system supplies the Table 6.2 roughness factor.</p><p>Ru2% uses Equations 6.1 and 6.2, including the surging-wave roughness correction and core-permeability limit. Equation 6.3 converts run-up to an overtopping percentage, but the manual warns that this overestimates the number actually passing the crest.</p></template>
-      <template v-else><p>Without an influencing foreshore, the plain-wall equations 7.1 or 7.2 are used. With a foreshore, h²/(Hm0Lm-1,0) separates non-impulsive conditions above 0.23 (Equations 7.5 or 7.6) from impulsive conditions. Impulsive cases then use the exponential branch below Rc/Hm0 = 1.35 (7.7 or 7.9) and the power-law branch above it (7.8 or 7.10).</p><p>A vertical wall has no front slope on which to define Ru2%. The percentage is therefore calculated directly with Equation 7.24 for non-impulsive waves or Equation 7.25 for impulsive waves.</p></template>
-      <p>The reported equation and regime update with the inputs. The graph shows the sensitivity of the selected family’s complete decision process, not a single permanently selected equation.</p>
-      <p>Source: EurOtop (2018), Manual on wave overtopping of sea defences and related structures, {{ section }}.</p>
+    <article class="background-panel"><div class="background-title"><h2>Background, equation selection and applicability</h2><span>−</span></div><div class="background-body eurotop-background">
+      <p>Wave overtopping is described by the mean discharge $q$ per metre of structure width. EurOtop normalises it as $q/\sqrt{gH_{m0}^{3}}$, allowing laboratory and prototype results at different scales to be compared. The incident $H_{m0}$ and $T_{m-1,0}$ must be conditions at the structure toe, after any transformation across the foreshore.</p>
+      <div class="equation">$$L_{m-1,0}=\frac{gT_{m-1,0}^{2}}{2\pi},\qquad \xi_{m-1,0}=\frac{\tan\alpha}{\sqrt{H_{m0}/L_{m-1,0}}}$$</div>
+      <template v-if="family==='smooth'">
+        <h3>Dikes and embankment seawalls</h3><p>For breaking waves on a relatively gentle slope, the mean-value relationship is:</p>
+        <div class="equation">$$\frac{q}{\sqrt{gH_{m0}^{3}}}=\frac{0.023}{\sqrt{\tan\alpha}}\,\gamma_b\xi_{m-1,0}\exp\left[-\left(\frac{2.7R_c}{\xi_{m-1,0}H_{m0}\gamma_b\gamma_f\gamma_\beta\gamma_v}\right)^{1.3}\right]$$</div>
+        <p>It is limited by the non-breaking maximum:</p><div class="equation">$$\frac{q}{\sqrt{gH_{m0}^{3}}}=0.09\exp\left[-\left(\frac{1.5R_c}{H_{m0}\gamma_f\gamma_\beta}\right)^{1.3}\right]$$</div>
+        <p>The calculator evaluates both and reports the smaller discharge. The design/assessment equations replace the coefficients $(0.023,2.7,0.09,1.5)$ with $(0.026,2.5,0.1035,1.35)$, incorporating model uncertainty.</p>
+        <h3>Run-up and overtopping waves</h3><div class="equation">$$\frac{R_{u2\%}}{H_{m0}}=\min\left[1.65\gamma_b\gamma_f\gamma_\beta\xi_{m-1,0},\;\gamma_f\gamma_\beta\left(4-\frac{1.5}{\sqrt{\gamma_b\xi_{m-1,0}}}\right)\right]$$</div>
+        <div class="equation">$$P_{ov}=\frac{N_{ow}}{N_w}=\exp\left[-\left(\sqrt{-\ln(0.02)}\frac{R_c}{R_{u2\%}}\right)^2\right]$$</div>
+        <p>The design run-up coefficients are 1.75 and 1.07. The wall factor $\gamma_v$ affects discharge but is deliberately excluded from run-up, following EurOtop.</p>
+      </template>
+      <template v-else-if="family==='rubble'">
+        <h3>Armoured rubble slopes and mounds</h3><p>For a simple steep armoured slope the mean-value discharge is:</p>
+        <div class="equation">$$\frac{q}{\sqrt{gH_{m0}^{3}}}=0.09\exp\left[-\left(\frac{1.5R_c}{H_{m0}\gamma_{f,mod}\gamma_\beta}\right)^{1.3}\right]$$</div>
+        <p>The design coefficients are 0.1035 and 1.35. For $\xi_{m-1,0}>5$, EurOtop progressively increases roughness towards a smooth-slope value:</p><div class="equation">$$\gamma_{f,mod}=\gamma_f+\frac{\min(\xi_{m-1,0},10)-5}{5}(1-\gamma_f)$$</div>
+        <p>The Table 6.2 factor depends on armour type, number of layers, placement and core permeability; selecting an armour name is therefore a starting point rather than a substitute for checking the actual section.</p>
+        <h3>Run-up and overtopping waves</h3><div class="equation">$$\frac{R_{u2\%}}{H_{m0}}=\min\left[1.65\gamma_f\gamma_\beta\xi_{m-1,0},\;\gamma_{f,surging}\gamma_\beta\left(4-\frac{1.5}{\sqrt{\xi_{m-1,0}}}\right)\right]$$</div>
+        <div class="equation">$$\gamma_{f,surging}=\gamma_f+\frac{\xi_{m-1,0}-1.8}{8.2}(1-\gamma_f),\qquad P_{ov}=\exp\left[-\left(\sqrt{-\ln(0.02)}\frac{R_c}{R_{u2\%}}\right)^2\right]$$</div>
+        <p>Run-up is capped at $R_{u2\%}/H_{m0}=3.0$ for an impermeable core and 2.0 for a permeable core (3.21 and 2.14 for design). Equation 6.3 assumes that crossing the run-up level is equivalent to overtopping. EurOtop warns that it therefore overestimates waves actually passing a crest berm or crown wall.</p>
+      </template>
+      <template v-else>
+        <h3>Vertical and steep walls</h3><p>Without an influencing foreshore, the mean-value plain-wall expression is:</p><div class="equation">$$\frac{q}{\sqrt{gH_{m0}^{3}}}=0.047\exp\left[-\left(2.35\frac{R_c}{H_{m0}}\right)^{1.3}\right]$$</div>
+        <p>Where a foreshore influences the wall, the impulse parameter separates non-impulsive and impulsive attack:</p><div class="equation">$$I=\frac{h^2}{H_{m0}L_{m-1,0}},\qquad I>0.23\;\text{non-impulsive},\quad I\leq0.23\;\text{impulsive}$$</div>
+        <p>For non-impulsive attack the mean-value relationship is:</p><div class="equation">$$\frac{q}{\sqrt{gH_{m0}^{3}}}=0.05\exp\left(-2.78\frac{R_c}{H_{m0}}\right)$$</div>
+        <p>Impulsive attack uses an exponential branch for $R_c/H_{m0}<1.35$ and an inverse-cube branch above that threshold. The output identifies the selected equation. Design coefficients are taken from Equations 7.2, 7.6, 7.9 and 7.10.</p>
+        <h3>Percentage of waves overtopping</h3><div class="equation">$$P_{ov}=\exp\left[-1.21\left(\frac{R_c}{H_{m0}}\right)^2\right]\quad\text{(non-impulsive)}$$</div>
+        <div class="equation">$$P_{ov}=\max\left\{\exp\left[-1.21\left(\frac{R_c}{H_{m0}}\right)^2\right],\;0.024\,I\left(\frac{R_c}{H_{m0}}\right)^{-1}\right\}\quad\text{(impulsive)}$$</div>
+        <p>A vertical wall has no seaward slope on which to define $R_{u2\%}$, so the calculator reports overtopping probability directly rather than a run-up level.</p>
+      </template>
+      <h3>Using the results</h3><ul><li>The sensitivity plot reruns the complete decision process, so it may cross from one governing equation to another.</li><li>Mean discharge, percentage of waves overtopping and individual overtopping volume describe different hazards and should not be interchanged.</li><li>Results outside the automated checks require closer review of EurOtop geometry limits, influence factors and physical-model evidence.</li></ul>
+      <p><strong>Source:</strong> EurOtop (2018), <em>Manual on wave overtopping of sea defences and related structures</em>, {{ section }}.</p>
     </div></article>
   </section>
 </template>

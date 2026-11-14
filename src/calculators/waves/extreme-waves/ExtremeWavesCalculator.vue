@@ -5,6 +5,8 @@ import { linspace } from '../../../engineering/numeric'
 import { stiveExtremeWaves } from '../../../engineering/extremeWaves'
 import { downloadExtremeWaveWorkbook } from '../../../export/extremeWaveWorkbook'
 
+const emit=defineEmits<{navigate:[id:'battjes-groenendijk']}>()
+
 const values=reactive({hm0:2,depth:4})
 const result=computed(()=>stiveExtremeWaves(values.hm0,values.depth))
 const curve=computed(()=>linspace(.01,1.2,120).map(r=>({r,h1:Math.sqrt(Math.log(100)/2)*(1+r)**(-1/3),h01:Math.sqrt(Math.log(1000)/2)*(1+r)**(-1/2)})))
@@ -39,7 +41,7 @@ const chartData=computed(()=>[
       <p>Stive (1986) proposed empirical corrections to the Rayleigh distribution for depth-limited waves:</p>
       <div class="equation">H₁% = Hm0 √(ln 100 / 2) (1 + Hm0/h)⁻¹ᐟ³</div>
       <div class="equation">H₀.₁% = Hm0 √(ln 1000 / 2) (1 + Hm0/h)⁻¹ᐟ²</div>
-      <p>The method is attractive because it needs only Hm0 and water depth. It was based on physical-model tests and a limited prototype check, so it is best treated as a transparent screening calculation. The later Battjes–Groenendijk (2000) composite Weibull distribution is more widely used for shallow foreshores and can predict a broader set of exceedance statistics, but it also needs foreshore information and a more involved solution. A future comparison calculator could add that method without weakening the clarity of this one.</p>
+      <p>The method is attractive because it needs only Hm0 and water depth. It was based on physical-model tests and a limited prototype check, so it is best treated as a transparent screening calculation. The later Battjes–Groenendijk (2000) composite Weibull distribution is more widely used for shallow foreshores and can predict a broader set of exceedance statistics, but it also needs foreshore information and a more involved solution. A separate <button class="inline-link" type="button" @click="emit('navigate','battjes-groenendijk')">Battjes–Groenendijk calculator</button> is included for that method.</p>
       <p>Only H₁% and H₀.₁% are presented as Stive results because those are the two published correction equations. The Rayleigh values show what the same sea state would produce without the shallow-water correction.</p>
     </div></article>
   </section>
