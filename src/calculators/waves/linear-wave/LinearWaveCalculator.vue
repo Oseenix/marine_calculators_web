@@ -3,6 +3,7 @@ import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import renderMathInElement from 'katex/contrib/auto-render'
 import 'katex/dist/katex.min.css'
 import PlotlyChart from '../../../components/PlotlyChart.vue'
+import InfoTip from '../../../components/InfoTip.vue'
 import {
   calculateLinearWave,
   orbitalProfile,
@@ -136,15 +137,15 @@ onMounted(async () => {
       <article class="panel input-panel">
         <div class="panel-title input-title"><h2>Input</h2></div>
         <label>
-          Wave height <span>m</span>
+          Wave height <span>m</span> <InfoTip text="Vertical distance from wave trough to crest at the calculation location." label="About wave height" />
           <input v-model.number="input.waveHeight" type="number" min="0" max="100" step="0.1" />
         </label>
         <label>
-          Wave period <span>s</span>
+          Wave period <span>s</span> <InfoTip text="Time between successive crests. Together with depth it determines wavelength and celerity." label="About wave period" />
           <input v-model.number="input.wavePeriod" type="number" min="0.01" max="25" step="0.1" />
         </label>
         <label>
-          Water depth <span>m</span>
+          Water depth <span>m</span> <InfoTip text="Still-water depth from the seabed to mean water level at the calculation location." label="About water depth" />
           <input v-model.number="input.waterDepth" type="number" min="0.01" max="6000" step="0.1" />
         </label>
         <p v-if="error" class="error" role="alert">{{ error }}</p>
@@ -153,14 +154,14 @@ onMounted(async () => {
       <article class="panel output-panel">
         <div class="panel-title output-title"><h2>Output</h2></div>
         <dl v-if="result" class="results">
-          <div class="primary-result"><dt>Relative depth</dt><dd>{{ result.relativeDepth }}</dd></div>
-          <div><dt>Offshore wave height</dt><dd>{{ fixed(result.offshoreWaveHeight, 2) }} <small>m</small></dd></div>
-          <div><dt>Wave celerity</dt><dd>{{ fixed(result.celerity, 2) }} <small>m/s</small></dd></div>
-          <div><dt>Group celerity</dt><dd>{{ fixed(result.groupCelerity, 2) }} <small>m/s</small></dd></div>
-          <div><dt>Wavelength</dt><dd>{{ fixed(result.wavelength, 2) }} <small>m</small></dd></div>
-          <div><dt>Energy density</dt><dd>{{ number.format(result.energyDensity) }} <small>J/m²</small></dd></div>
-          <div><dt>Energy flux</dt><dd>{{ number.format(result.energyFlux) }} <small>W/m</small></dd></div>
-          <div><dt>Max. bed orbital velocity</dt><dd>{{ fixed(result.maximumBedOrbitalVelocity, 4) }} <small>m/s</small></dd></div>
+          <div class="primary-result"><dt>Relative depth <InfoTip text="Classification based on water depth divided by wavelength: shallow, transitional or deep." /></dt><dd>{{ result.relativeDepth }}</dd></div>
+          <div><dt>Offshore wave height <InfoTip text="Equivalent deep-water wave height obtained by reversing the linear shoaling transformation." /></dt><dd>{{ fixed(result.offshoreWaveHeight, 2) }} <small>m</small></dd></div>
+          <div><dt>Wave celerity <InfoTip text="Speed at which an individual wave crest and phase travel." /></dt><dd>{{ fixed(result.celerity, 2) }} <small>m/s</small></dd></div>
+          <div><dt>Group celerity <InfoTip text="Speed at which wave energy and a wave group propagate." /></dt><dd>{{ fixed(result.groupCelerity, 2) }} <small>m/s</small></dd></div>
+          <div><dt>Wavelength <InfoTip text="Horizontal crest-to-crest distance satisfying the linear dispersion relation." /></dt><dd>{{ fixed(result.wavelength, 2) }} <small>m</small></dd></div>
+          <div><dt>Energy density <InfoTip text="Mean wave energy per unit horizontal sea-surface area." /></dt><dd>{{ number.format(result.energyDensity) }} <small>J/m²</small></dd></div>
+          <div><dt>Energy flux <InfoTip text="Wave power transmitted per metre of wave crest, equal to energy density times group celerity." /></dt><dd>{{ number.format(result.energyFlux) }} <small>W/m</small></dd></div>
+          <div><dt>Max. bed orbital velocity <InfoTip text="Maximum horizontal water-particle speed at the seabed predicted by linear theory." /></dt><dd>{{ fixed(result.maximumBedOrbitalVelocity, 4) }} <small>m/s</small></dd></div>
         </dl>
       </article>
 

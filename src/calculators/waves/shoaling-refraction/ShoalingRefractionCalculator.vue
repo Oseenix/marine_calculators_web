@@ -2,6 +2,7 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import renderMathInElement from 'katex/contrib/auto-render'
 import PlotlyChart from '../../../components/PlotlyChart.vue'
+import InfoTip from '../../../components/InfoTip.vue'
 import { calculateShoalingRefraction, validateShoalingRefractionInput, type ShoalingRefractionInput } from '../../../engineering/waves/shoalingRefraction'
 import { buildShoalingSweep, inputLabels, inputUnits, outputLabels, outputUnits, type ShoalingSweepInput, type ShoalingSweepOutput } from './series'
 import { downloadShoalingWorkbook } from '../../../export/waveTheoryWorkbooks'
@@ -56,19 +57,19 @@ onMounted(async () => {
     <div class="calculator-grid compact-calculator-grid">
       <article class="panel input-panel">
         <div class="panel-title input-title"><h2>Input</h2></div>
-        <label>Deep Water Wave Height <span>(m)</span><input v-model.number="input.deepWaterWaveHeight" type="number" min="0" max="20" step="0.1" /></label>
-        <label>Wave Period <span>(s)</span><input v-model.number="input.wavePeriod" type="number" min="0.01" max="20" step="0.1" /></label>
-        <label>Water Depth <span>(m)</span><input v-model.number="input.waterDepth" type="number" min="0.01" max="6000" step="0.1" /></label>
-        <label>Wave Direction <span>(deg)</span><input v-model.number="input.deepWaterDirection" type="number" min="0" max="90" step="1" /></label>
+        <label>Deep Water Wave Height <span>(m)</span> <InfoTip text="Incident wave height before shoaling and refraction caused by the seabed become important." /><input v-model.number="input.deepWaterWaveHeight" type="number" min="0" max="20" step="0.1" /></label>
+        <label>Wave Period <span>(s)</span> <InfoTip text="Time between successive crests; assumed unchanged during linear shoaling and refraction." /><input v-model.number="input.wavePeriod" type="number" min="0.01" max="20" step="0.1" /></label>
+        <label>Water Depth <span>(m)</span> <InfoTip text="Target local water depth at which the transformed wave is calculated." /><input v-model.number="input.waterDepth" type="number" min="0.01" max="6000" step="0.1" /></label>
+        <label>Wave Direction <span>(deg)</span> <InfoTip text="Deep-water angle between the wave ray and the shore-normal/depth-contour normal." /><input v-model.number="input.deepWaterDirection" type="number" min="0" max="90" step="1" /></label>
         <p v-if="error" class="error" role="alert">{{ error }}</p>
       </article>
 
       <article class="panel output-panel">
         <div class="panel-title output-title"><h2>Output</h2></div>
         <dl v-if="result" class="results">
-          <div><dt>Shoaling Coefficient (<i>K</i><sub>s</sub>)</dt><dd>{{ result.shoalingCoefficient.toFixed(4) }}</dd></div>
-          <div><dt>Refraction Coefficient (<i>K</i><sub>r</sub>)</dt><dd>{{ result.refractionCoefficient.toFixed(4) }}</dd></div>
-          <div><dt>Shallow Water Wave Height (<i>H</i><sub>s</sub>)</dt><dd>{{ result.shallowWaterWaveHeight.toFixed(2) }} m</dd></div>
+          <div><dt>Shoaling Coefficient (<i>K</i><sub>s</sub>) <InfoTip text="Wave-height multiplier caused by the change in group velocity as waves enter shallower water." /></dt><dd>{{ result.shoalingCoefficient.toFixed(4) }}</dd></div>
+          <div><dt>Refraction Coefficient (<i>K</i><sub>r</sub>) <InfoTip text="Wave-height multiplier caused by convergence or divergence of wave rays as direction changes." /></dt><dd>{{ result.refractionCoefficient.toFixed(4) }}</dd></div>
+          <div><dt>Shallow Water Wave Height (<i>H</i><sub>s</sub>) <InfoTip text="Local transformed wave height after applying both shoaling and refraction coefficients." /></dt><dd>{{ result.shallowWaterWaveHeight.toFixed(2) }} m</dd></div>
         </dl>
       </article>
 

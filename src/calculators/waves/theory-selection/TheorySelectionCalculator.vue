@@ -2,6 +2,7 @@
 import renderMathInElement from 'katex/contrib/auto-render'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import PlotlyChart from '../../../components/PlotlyChart.vue'
+import InfoTip from '../../../components/InfoTip.vue'
 import { chooseTheoryFromDimensionless, chooseWaveTheory } from '../../../engineering/waves/theorySelection'
 import { solveFourier, type FourierSolution } from '../../../engineering/waves/fourierSolver'
 
@@ -76,9 +77,9 @@ onMounted(async () => {
     <div class="calculator-grid theory-grid">
       <article class="panel input-panel">
         <div class="panel-title input-title"><h2>Input</h2></div>
-        <label>Wave Height <span>(m)</span><input v-model.number="waveHeight" type="number" min="0" step="any" /></label>
-        <label>Wave Period <span>(s)</span><input v-model.number="wavePeriod" type="number" min="0.01" step="any" /></label>
-        <label>Water Depth <span>(m)</span><input v-model.number="waterDepth" type="number" min="0.01" step="any" /></label>
+        <label>Wave Height <span>(m)</span> <InfoTip text="Regular-wave trough-to-crest height used to assess nonlinearity and proximity to breaking." /><input v-model.number="waveHeight" type="number" min="0" step="any" /></label>
+        <label>Wave Period <span>(s)</span> <InfoTip text="Time between crests; longer periods increase wavelength and can make seabed influence more important." /><input v-model.number="wavePeriod" type="number" min="0.01" step="any" /></label>
+        <label>Water Depth <span>(m)</span> <InfoTip text="Still-water depth used to place the case on the wave-theory applicability map." /><input v-model.number="waterDepth" type="number" min="0.01" step="any" /></label>
         <p v-if="error" class="error">{{ error }}</p>
       </article>
       <article class="panel output-panel">

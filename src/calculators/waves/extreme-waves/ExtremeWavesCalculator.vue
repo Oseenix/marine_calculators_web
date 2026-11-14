@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
 import PlotlyChart from '../../../components/PlotlyChart.vue'
+import InfoTip from '../../../components/InfoTip.vue'
 import { linspace } from '../../../engineering/numeric'
 import { stiveExtremeWaves } from '../../../engineering/extremeWaves'
 import { downloadExtremeWaveWorkbook } from '../../../export/extremeWaveWorkbook'
@@ -23,15 +24,15 @@ const chartData=computed(()=>[
     <p class="theory-intro">Significant wave height describes a sea state, but individual waves can be appreciably higher. Stive’s simple empirical correction reduces the deep-water Rayleigh extremes as waves become depth limited.</p>
     <div class="calculator-grid">
       <article class="panel input-panel"><div class="panel-title input-title"><h2>Input</h2></div>
-        <label>Spectral Significant Wave Height, Hm0 (m)<input v-model.number="values.hm0" type="number" min="0.001" step="any" /></label>
-        <label>Water Depth, h (m)<input v-model.number="values.depth" type="number" min="0.001" step="any" /></label>
+        <label>Spectral Significant Wave Height, Hm0 (m) <InfoTip text="Four times the square root of the zero-th spectral moment for the local sea state." /><input v-model.number="values.hm0" type="number" min="0.001" step="any" /></label>
+        <label>Water Depth, h (m) <InfoTip text="Local still-water depth used to measure how strongly the largest waves are depth limited." /><input v-model.number="values.depth" type="number" min="0.001" step="any" /></label>
       </article>
       <article class="panel output-panel"><div class="panel-title output-title"><h2>Output</h2></div><dl class="results">
-        <div><dt>Relative Wave Height, Hm0/h</dt><dd>{{ result.ratio.toFixed(3) }}</dd></div>
-        <div><dt>1% Exceedance Wave Height, H1%</dt><dd>{{ result.h1.toFixed(2) }} m</dd></div>
-        <div><dt>0.1% Exceedance Wave Height, H0.1%</dt><dd>{{ result.h01.toFixed(2) }} m</dd></div>
-        <div><dt>Deep-Water Rayleigh H1%</dt><dd>{{ result.rayleighH1.toFixed(2) }} m</dd></div>
-        <div><dt>Deep-Water Rayleigh H0.1%</dt><dd>{{ result.rayleighH01.toFixed(2) }} m</dd></div>
+        <div><dt>Relative Wave Height, Hm0/h <InfoTip text="Significant wave height divided by depth; larger values indicate stronger depth limitation." /></dt><dd>{{ result.ratio.toFixed(3) }}</dd></div>
+        <div><dt>1% Exceedance Wave Height, H1% <InfoTip text="Individual wave height exceeded by approximately one wave in every 100 according to Stive's shallow-water correction." /></dt><dd>{{ result.h1.toFixed(2) }} m</dd></div>
+        <div><dt>0.1% Exceedance Wave Height, H0.1% <InfoTip text="Individual wave height exceeded by approximately one wave in every 1,000 according to Stive's correction." /></dt><dd>{{ result.h01.toFixed(2) }} m</dd></div>
+        <div><dt>Deep-Water Rayleigh H1% <InfoTip text="One-percent exceedance height from an unmodified Rayleigh distribution, shown as a deep-water reference." /></dt><dd>{{ result.rayleighH1.toFixed(2) }} m</dd></div>
+        <div><dt>Deep-Water Rayleigh H0.1% <InfoTip text="0.1-percent exceedance height from an unmodified Rayleigh distribution, shown for comparison." /></dt><dd>{{ result.rayleighH01.toFixed(2) }} m</dd></div>
       </dl></article>
       <article class="panel charts-panel"><div class="panel-title graphical-title"><h2>Graphical</h2></div><div class="graphical-body">
         <PlotlyChart :data="chartData" :layout="{xaxis:{title:{text:'Relative wave height, Hm0/h'}},yaxis:{title:{text:'Extreme wave height / Hm0'}},legend:{orientation:'h',x:.5,xanchor:'center',y:1.16},margin:{t:58,b:52}}" />

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
 import PlotlyChart from '../../../components/PlotlyChart.vue'
+import InfoTip from '../../../components/InfoTip.vue'
 import { battjesGroenendijk } from '../../../engineering/battjesGroenendijk'
 
 const values = reactive({ hm0: 3.9, depth: 7, cotSlope: 40 })
@@ -19,18 +20,18 @@ const chartData = computed(() => [
     <div class="calculator-heading"><div><h1>Shallow-Water Wave Height Distribution</h1><p class="eurotop-section">Battjes–Groenendijk composite Weibull method</p></div></div>
     <div class="calculator-grid">
       <article class="panel input-panel"><div class="panel-title input-title"><h2>Input</h2></div>
-        <label>Spectral Wave Height, Hm0 (m)<input v-model.number="values.hm0" type="number" min=".01" step="any" /></label>
-        <label>Local Water Depth, h (m)<input v-model.number="values.depth" type="number" min=".01" step="any" /></label>
-        <label>Foreshore Slope, cot α (1V:nH)<input v-model.number="values.cotSlope" type="number" min="1" step="any" /></label>
+        <label>Spectral Wave Height, Hm0 (m) <InfoTip text="Local spectral significant wave height after transformation across the foreshore." /><input v-model.number="values.hm0" type="number" min=".01" step="any" /></label>
+        <label>Local Water Depth, h (m) <InfoTip text="Still-water depth at the location where the individual-wave distribution is required." /><input v-model.number="values.depth" type="number" min=".01" step="any" /></label>
+        <label>Foreshore Slope, cot α (1V:nH) <InfoTip text="Horizontal distance per unit vertical rise. The principal calibration range was approximately 1:20 to 1:250." /><input v-model.number="values.cotSlope" type="number" min="1" step="any" /></label>
       </article>
       <article class="panel output-panel"><div class="panel-title output-title"><h2>Output</h2></div><dl class="results">
-        <div><dt>Root-mean-square Height, Hrms</dt><dd>{{ result.hrms.toFixed(3) }} m</dd></div>
-        <div><dt>Transition Height, Htr</dt><dd>{{ result.transitionHeight.toFixed(3) }} m</dd></div>
-        <div><dt>H1/3</dt><dd>{{ result.h13.toFixed(3) }} m</dd></div>
-        <div><dt>H1/10</dt><dd>{{ result.h110.toFixed(3) }} m</dd></div>
-        <div><dt>H2%</dt><dd>{{ result.h2Percent.toFixed(3) }} m</dd></div>
-        <div><dt>H1%</dt><dd>{{ result.h1Percent.toFixed(3) }} m</dd></div>
-        <div><dt>H0.1%</dt><dd>{{ result.h01Percent.toFixed(3) }} m</dd></div>
+        <div><dt>Root-mean-square Height, Hrms <InfoTip text="Square root of the mean squared individual wave heights, inferred from Hm0 and relative depth." /></dt><dd>{{ result.hrms.toFixed(3) }} m</dd></div>
+        <div><dt>Transition Height, Htr <InfoTip text="Height at which the composite distribution changes from Weibull exponent 2 to exponent 3.6." /></dt><dd>{{ result.transitionHeight.toFixed(3) }} m</dd></div>
+        <div><dt>H1/3 <InfoTip text="Mean height of the highest one-third of individual waves." /></dt><dd>{{ result.h13.toFixed(3) }} m</dd></div>
+        <div><dt>H1/10 <InfoTip text="Mean height of the highest one-tenth of individual waves." /></dt><dd>{{ result.h110.toFixed(3) }} m</dd></div>
+        <div><dt>H2% <InfoTip text="Individual wave height exceeded by 2% of waves, or about one wave in 50." /></dt><dd>{{ result.h2Percent.toFixed(3) }} m</dd></div>
+        <div><dt>H1% <InfoTip text="Individual wave height exceeded by 1% of waves, or about one wave in 100." /></dt><dd>{{ result.h1Percent.toFixed(3) }} m</dd></div>
+        <div><dt>H0.1% <InfoTip text="Individual wave height exceeded by 0.1% of waves, or about one wave in 1,000." /></dt><dd>{{ result.h01Percent.toFixed(3) }} m</dd></div>
       </dl><div :class="result.clamped || values.cotSlope<20 || values.cotSlope>250?'applicability-warning':'applicability-ok'">{{ result.clamped?'Htr/Hrms is outside the published table range (0.05–3.0); the nearest tabulated limit is being used.':values.cotSlope<20 || values.cotSlope>250?'The foreshore slope is outside the principal calibration range of 1:20 to 1:250.':'The transition ratio and foreshore slope lie within the published ranges.' }}</div></article>
       <article class="panel charts-panel"><div class="panel-title graphical-title"><h2>Graphical</h2></div><div class="graphical-body eurotop-graphical">
         <PlotlyChart :data="chartData" :layout="{barmode:'group',xaxis:{title:{text:'Characteristic wave height'}},yaxis:{title:{text:'Wave height (m)'},rangemode:'tozero'},legend:{orientation:'h'}}" />

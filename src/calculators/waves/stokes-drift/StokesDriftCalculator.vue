@@ -2,6 +2,7 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import renderMathInElement from 'katex/contrib/auto-render'
 import PlotlyChart from '../../../components/PlotlyChart.vue'
+import InfoTip from '../../../components/InfoTip.vue'
 import { calculateStokesDrift, stokesDriftProfile, validateStokesDriftInput, type StokesDriftInput } from '../../../engineering/waves/stokesDrift'
 import { downloadStokesDriftWorkbook } from '../../../export/waveTheoryWorkbooks'
 
@@ -44,16 +45,16 @@ onMounted(async () => {
     <div class="calculator-grid compact-calculator-grid">
       <article class="panel input-panel">
         <div class="panel-title input-title"><h2>Input</h2></div>
-        <label>Wave Height <span>(m)</span><input v-model.number="input.waveHeight" type="number" min="0" max="50" step="0.1" /></label>
-        <label>Wave Period <span>(s)</span><input v-model.number="input.wavePeriod" type="number" min="0.01" max="1000" step="0.1" /></label>
-        <label>Water Depth <span>(m)</span><input v-model.number="input.waterDepth" type="number" min="0.01" max="5000" step="0.1" /></label>
+        <label>Wave Height <span>(m)</span> <InfoTip text="Wave height used by the second-order Stokes-drift relationship." /><input v-model.number="input.waveHeight" type="number" min="0" max="50" step="0.1" /></label>
+        <label>Wave Period <span>(s)</span> <InfoTip text="Time between crests; shorter periods generally produce stronger surface Stokes drift for a given height." /><input v-model.number="input.wavePeriod" type="number" min="0.01" max="1000" step="0.1" /></label>
+        <label>Water Depth <span>(m)</span> <InfoTip text="Still-water depth used to calculate the vertical decay and depth-averaged drift." /><input v-model.number="input.waterDepth" type="number" min="0.01" max="5000" step="0.1" /></label>
         <p v-if="error" class="error" role="alert">{{ error }}</p>
       </article>
       <article class="panel output-panel">
         <div class="panel-title output-title"><h2>Output</h2></div>
         <dl v-if="result" class="results">
-          <div><dt>Surface Stokes Drift (<i>U</i><sub>s</sub>)</dt><dd>{{ result.surface.toFixed(3) }} m/s</dd></div>
-          <div><dt>Depth Averaged Stokes Drift (<span class="overline"><i>U</i><sub>s</sub></span>)</dt><dd>{{ result.depthAverage.toFixed(3) }} m/s</dd></div>
+          <div><dt>Surface Stokes Drift (<i>U</i><sub>s</sub>) <InfoTip text="Net Lagrangian particle drift at the water surface caused by the wave motion." /></dt><dd>{{ result.surface.toFixed(3) }} m/s</dd></div>
+          <div><dt>Depth Averaged Stokes Drift (<span class="overline"><i>U</i><sub>s</sub></span>) <InfoTip text="Stokes drift averaged from seabed to surface; useful for depth-integrated transport estimates." /></dt><dd>{{ result.depthAverage.toFixed(3) }} m/s</dd></div>
         </dl>
       </article>
       <article class="panel charts-panel">
