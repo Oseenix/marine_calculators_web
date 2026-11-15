@@ -201,7 +201,7 @@ onMounted(async () => {
         <div class="equation">$$u_{max}(h) = \frac{\pi H}{T}\frac{\cosh(kh)}{\sinh(kz)}$$</div>
         <p>At the seabed, where $h=0$, this reduces to $u_b = \frac{H\pi}{T\sinh(kz)}$.</p>
         <p>See the Wave Shoaling and Refraction calculator for the shoaling coefficient used to calculate offshore wave height.</p>
-        <p><strong>References</strong><br />Fenton, J. D., &amp; McKee, W. D. (1990). On calculating the lengths of water waves. <em>Coastal Engineering, 14</em>(6), 499–513.<br />Airy, G. B. (1841). Tides and waves. In H. J. Rose et al. (eds.), <em>Encyclopaedia Metropolitana: Mixed Sciences</em>, Vol. 3.</p>
+        <p><strong>References</strong><br /><a href="https://doi.org/10.1016/0378-3839(90)90032-R" target="_blank" rel="noopener">Fenton, J. D., &amp; McKee, W. D. (1990). On calculating the lengths of water waves.</a> <em>Coastal Engineering, 14</em>(6), 499–513.<br /><a href="https://archive.org/details/encyclopaediamet05lond" target="_blank" rel="noopener">Airy, G. B. (1841). Tides and waves.</a> In H. J. Rose et al. (eds.), <em>Encyclopaedia Metropolitana: Mixed Sciences</em>, Vol. 3.</p>
       </div>
     </article>
   </section>

@@ -99,7 +99,7 @@ onMounted(async () => {
         <p>The refraction coefficient is</p>
         <div class="equation">$$K_r=\left(\frac{1-\sin^2\theta_0}{1-\sin^2\theta_1}\right)^{1/4}$$</div>
         <p>where $sin\theta_1=C_1\sin\theta_0/C_0$, $C_1=L/T$, and $	heta_0$ is the deep-water wave direction relative to the coast.</p>
-        <p><strong>References</strong><br />Fenton, J. D., &amp; McKee, W. D. (1990). On calculating the lengths of water waves. <em>Coastal Engineering, 14</em>(6), 499–513.<br />U.S. Army Corps of Engineers (2006). <em>Coastal Engineering Manual</em>, Section II-3-13.</p>
+        <p><strong>References</strong><br /><a href="https://doi.org/10.1016/0378-3839(90)90032-R" target="_blank" rel="noopener">Fenton, J. D., &amp; McKee, W. D. (1990). On calculating the lengths of water waves.</a> <em>Coastal Engineering, 14</em>(6), 499–513.<br /><a href="https://www.publications.usace.army.mil/USACE-Publications/Engineer-Manuals/u43544q/313131302d322d31313030/" target="_blank" rel="noopener">U.S. Army Corps of Engineers (2006). <em>Coastal Engineering Manual</em></a>, Section II-3-13.</p>
       </div>
     </article>
   </section>

@@ -75,7 +75,7 @@ onMounted(async () => {
         <p>The depth-averaged drift through water depth $h$ is</p>
         <div class="equation">$$\overline{U}=\frac{U_s}{2kh}\left(1-e^{-2kh}\right)$$</div>
         <p>No account is taken of bed friction.</p>
-        <p><strong>References</strong><br />Fenton, J. D., &amp; McKee, W. D. (1990). On calculating the lengths of water waves. <em>Coastal Engineering, 14</em>(6), 499–513.<br />Phillips, O. M. (1977). <em>The Dynamics of the Upper Ocean</em> (2nd ed.). Cambridge University Press.</p>
+        <p><strong>References</strong><br /><a href="https://doi.org/10.1016/0378-3839(90)90032-R" target="_blank" rel="noopener">Fenton, J. D., &amp; McKee, W. D. (1990). On calculating the lengths of water waves.</a> <em>Coastal Engineering, 14</em>(6), 499–513.<br /><a href="https://www.cambridge.org/core/books/dynamics-of-the-upper-ocean/78D227BBF7FBCAC164410A348DCBD8C2" target="_blank" rel="noopener">Phillips, O. M. (1977). <em>The Dynamics of the Upper Ocean</em></a> (2nd ed.). Cambridge University Press.</p>
       </div>
     </article>
   </section>

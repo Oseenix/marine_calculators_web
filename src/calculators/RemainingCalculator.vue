@@ -19,7 +19,7 @@ const configs:Record<RemainingId,Config>={
  'bed-shear':{title:'Bed Shear Stress (Waves and Currents)',fields:[['H','Wave Height','m',2],['T','Wave Period','s',8],['phi','Wave–Current Angle','deg',45],['U','Depth-Averaged Current Speed','m/s',.5],['z0','Bed Roughness Length','m',.002],['depth','Water Depth','m',50],['rho','Water Density','kg/m³',1027]].map(([key,label,unit,value])=>({key:key as string,label:label as string,unit:unit as string,value:value as number,min:0})),calculate:v=>bedShear(v.H,v.T,v.phi,v.U,v.z0,v.depth,v.rho),outputs:[{key:'uw',label:'Bed Orbital Velocity',unit:'m/s',digits:3},{key:'A',label:'Orbital Semi-Excursion',unit:'m',digits:3},{key:'cd',label:'Drag Coefficient',digits:6},{key:'fw',label:'Wave Friction Factor',digits:6},{key:'tauC',label:'Current-Only Shear Stress',unit:'N/m²',digits:4},{key:'tauW',label:'Wave-Only Shear Stress',unit:'N/m²',digits:4},{key:'tauM',label:'Mean Combined Shear Stress',unit:'N/m²',digits:4},{key:'tauMax',label:'Maximum Combined Shear Stress',unit:'N/m²',digits:4}],background:'Combined wave–current shear stress uses the simple DATA13 method of Soulsby (1997), assuming rough turbulent flow. $\\tau_c=\\rho C_DU^2$ and $\\tau_w=\\tfrac12\\rho f_wU_w^2$.'},
  'critical-current':{title:'Critical Depth Averaged Current Speed (Non-Cohesive)',fields:[{key:'d',label:'Median Grain Size',unit:'m',value:.0001},{key:'depth',label:'Water Depth',unit:'m',value:10},{key:'rhoS',label:'Particle Density',unit:'kg/m³',value:2650},{key:'rho',label:'Fluid Density',unit:'kg/m³',value:1027}],calculate:v=>criticalSediment(v.d,v.depth,10,v.rhoS,v.rho),outputs:[{key:'dStar',label:'D*',digits:2},{key:'current',label:'Critical Depth-Averaged Current Speed',unit:'m/s',digits:3}],background:'The threshold current follows Soulsby (1997): $\\bar U_{cr}=7(h/d_{50})^{1/7}[g(s-1)d_{50}f(D_*)]^{1/2}$.'},
  'critical-shear':{title:'Critical Bed Shear Stress (Non-Cohesive)',fields:[{key:'d',label:'Grain Size',unit:'m',value:.0002},{key:'rhoS',label:'Particle Density',unit:'kg/m³',value:2650},{key:'rho',label:'Fluid Density',unit:'kg/m³',value:1027}],calculate:v=>criticalSediment(v.d,10,10,v.rhoS,v.rho),outputs:[{key:'dStar',label:'D*',digits:2},{key:'shields',label:'Critical Shields Parameter',digits:4},{key:'shear',label:'Critical Bed Shear Stress',unit:'N/m²',digits:3}],background:'The critical Shields parameter is $\\theta_{cr}=0.30/(1+1.2D_*)+0.055[1-e^{-0.02D_*}]$, and $\\tau_{cr}=\\theta_{cr}g(\\rho_s-\\rho)d$.'},
- 'critical-orbital':{title:'Critical Bed Orbital Velocity (Non-Cohesive)',fields:[{key:'d',label:'Grain Size',unit:'m',value:.0002},{key:'T',label:'Wave Period',unit:'s',value:10},{key:'rhoS',label:'Particle Density',unit:'kg/m³',value:2650},{key:'rho',label:'Fluid Density',unit:'kg/m³',value:1027}],calculate:v=>criticalSediment(v.d,10,v.T,v.rhoS,v.rho),outputs:[{key:'orbital',label:'Critical Bed Orbital Velocity',unit:'m/s',digits:3}],background:'Critical bed orbital velocity follows the piecewise Soulsby (1997) relationship for grains below and above 0.5 mm.'},
+ 'critical-orbital':{title:'Critical Bed Orbital Velocity (Non-Cohesive)',fields:[{key:'d',label:'Grain Size',unit:'m',value:.0002},{key:'T',label:'Wave Period',unit:'s',value:10},{key:'rhoS',label:'Particle Density',unit:'kg/m³',value:2650},{key:'rho',label:'Fluid Density',unit:'kg/m³',value:1027}],calculate:v=>criticalSediment(v.d,10,v.T,v.rhoS,v.rho),outputs:[{key:'orbital',label:'Critical Bed Orbital Velocity',unit:'m/s',digits:3}],background:'Critical bed orbital velocity follows the piecewise Komar and Miller (1975) relationship for grains below and above 0.5 mm.'},
  'beach-slope':{title:'Beach-Face Slope by Grain Size',fields:[{key:'d',label:'Median Grain Size',unit:'m',value:.001,min:.000126}],calculate:v=>({slope:beachSlope(v.d)}),outputs:[{key:'slope',label:'Beach Slope',digits:3}],background:'Beach-face slope is estimated from median grain size using the empirical relationship in the original application: $\\beta=-0.178(d_{50,mm}-0.125)^{-0.187}+0.294$.'},
  'sediment-density':{title:'Sediment Density and Porosity',fields:[['sand','Percentage Sand','%',30],['silt','Percentage Silt','%',30],['clay','Percentage Clay','%',40],['rhoW','Water Density','kg/m³',1025],['rhoS','Specific Sediment Density','kg/m³',2650]].map(([key,label,unit,value])=>({key:key as string,label:label as string,unit:unit as string,value:value as number,min:0})),calculate:v=>sedimentDensity(v.sand,v.silt,v.clay,v.rhoW,v.rhoS),outputs:[{key:'dry',label:'Dry Bulk Density',unit:'kg/m³',digits:2},{key:'wet',label:'Wet Bulk Density',unit:'kg/m³',digits:2},{key:'porosity',label:'Porosity',digits:2}],background:'Dry density is a weighted empirical combination of sand, silt and clay fractions. Wet bulk density and porosity are then calculated from water and particle densities.'},
  'wind-setup':{title:'Wind Setup in an Enclosed Water Body',fields:[{key:'wind',label:'Wind Speed',unit:'m/s',value:25},{key:'depth',label:'Average Depth',unit:'m',value:1},{key:'fetch',label:'Fetch',unit:'m',value:4000}],calculate:v=>({setup:enclosedWindSetup(v.wind,v.depth,v.fetch)}),outputs:[{key:'setup',label:'Leeward Wind Setup',unit:'m',digits:3}],background:'Wind setup follows Saville (1952). The calculator reports the approximate rise at the leeward end, taken as one half of the total windward-to-leeward water-level difference for a rectangular basin.'},
@@ -66,7 +66,7 @@ $C_D=0.00063+(0.00723-0.00063)\\frac{U_{10}}{100}$
 
 These relationships are empirical and should be applied cautiously outside the calibration conditions.
 
-Reference: Sánchez, A., et al. (2007), fringing-reef wave and wind setup relationships used in the original application.`,
+References: Sánchez, A., Smith, J. M., Demirbilek, Z., & Boc, S. (2007). Combined Wind and Waves over a Fringing Reef. Gourlay, M. R. (1996). Wave set-up on coral reefs. 2. Set-up on reefs with various profiles. Seelig, W. N. (1983). Laboratory Study of Reef-Lagoon System Hydraulics.`,
   'fall-velocity': `Fall velocity for non-cohesive sediment is calculated with two methods. Ferguson and Church (2004) define
 
 $w=\\frac{Rg d^2}{C_1\\nu+\\sqrt{0.75C_2Rg d^3}}$
@@ -131,7 +131,7 @@ $\\tau_{cr}=\\theta_{cr}g(\\rho_s-\\rho)d$
 Here $d$ is grain diameter, $s=\\rho_s/\\rho$, and $\\nu=1.36\\times10^{-6}\\,m^2/s$.
 
 Reference: Soulsby, R. L. (1997). Dynamics of Marine Sands. Thomas Telford.`,
-  'critical-orbital': `Critical bed orbital velocity for non-cohesive sediment follows Soulsby (1997). For $d<0.5$ mm:
+  'critical-orbital': `Critical bed orbital velocity for non-cohesive sediment follows Komar and Miller (1975). For $d<0.5$ mm:
 
 $U_{w,cr}=[0.118g(s-1)]^{2/3}d^{1/3}T^{1/3}$
 
@@ -141,7 +141,7 @@ $U_{w,cr}=[1.09g(s-1)]^{4/7}d^{3/7}T^{1/7}$
 
 where $s=\\rho_s/\\rho$, $d$ is grain diameter and $T$ is wave period.
 
-Reference: Soulsby, R. L. (1997). Dynamics of Marine Sands. Thomas Telford.`,
+Reference: Komar, P. D., & Miller, M. C. (1975). Sediment threshold under oscillatory waves. In Coastal Engineering 1974, 756-775.`,
   'beach-slope': `Beach-face slope is estimated from median grain size using the empirical relationship
 
 $\\beta=-0.178(d_{50,mm}-0.125)^{-0.187}+0.294$
@@ -163,7 +163,9 @@ and porosity is
 
 $n=\\frac{\\rho_s-\\rho_{dry}}{\\rho_s}$
 
-where $\\rho_w$ is water density and $\\rho_s$ is the specific density of sediment particles.`,
+where $\\rho_w$ is water density and $\\rho_s$ is the specific density of sediment particles.
+
+References: Van Rijn, L. C. (1993). Principles of Sediment Transport in Rivers, Estuaries and Coastal Seas. Lara, J. M., & Pemberton, E. L. (1963). Initial unit weight of deposited sediments.`,
   'wind-setup': `Wind setup in an enclosed water body follows Saville (1952). The total difference in water level between the windward and leeward ends is represented as
 
 $S=k\\frac{U_{10}^{2}F}{gh}\\cos\\theta$
@@ -195,7 +197,7 @@ $D_{n50}=\\frac{H_s}{\\Delta N_s}, \\qquad \\Delta=\\frac{\\rho_s}{\\rho_w}-1$
 
 The calculator selects the plunging or surging expression using $\\xi_m$, $\\xi_{mc}$ and slope limits.
 
-Reference: Van der Meer, J. W. (1988). Rock slopes and gravel beaches under wave attack. Delft Hydraulics Communication No. 396.`,
+References: Van der Meer, J. W. (1988). Rock slopes and gravel beaches under wave attack. Delft Hydraulics Communication No. 396. CIRIA, CUR, CETMEF (2007). The Rock Manual: The Use of Rock in Hydraulic Engineering, 2nd edition, C683.`,
   'overtopping': `Runup and overtopping follow EurOtop relationships for sea dikes and revetments. Surf similarity is
 
 $\\xi_m=s_m^{-1/2}\\tan\\alpha, \\qquad s_m=H_s/L_0$
@@ -231,7 +233,9 @@ and
 
 $0\\le d_sH/(Bd_{50})\\le2.14$.
 
-Results outside these ranges are flagged and should not be relied upon without further validation.`,
+Results outside these ranges are flagged and should not be relied upon without further validation.
+
+Reference: Seabrook, S. R., & Hall, K. R. (1999). Wave transmission at submerged rubblemound breakwaters. In Coastal Engineering 1998, 2000-2013.`,
   'reef-balls': `Wave transmission over a Reef Ball array is expressed using relative submergence
 
 $R^*=R_c/H$
@@ -262,6 +266,36 @@ const backgroundImages: Partial<Record<RemainingId,{src:string;alt:string;captio
     { src: 'wave-reduction-factors.png', alt: 'EurOtop wave reduction factor guidance', caption: 'Wave reduction factors from the original background.' },
     { src: 'eurotop-coefficients.png', alt: 'EurOtop coefficient guidance table', caption: 'EurOtop coefficient guidance used by the original calculator.' },
   ],
+}
+type ReferenceLink={label:string;url:string}
+const referenceLinks:Partial<Record<RemainingId,ReferenceLink[]>>={
+  'wave-setup':[{label:'Stockdon et al. (2006)',url:'https://doi.org/10.1016/j.coastaleng.2005.12.005'}],
+  'fringe-setup':[
+    {label:'Sánchez et al. (2007) conference paper (PDF)',url:'https://waveworkshop.org/conferences/2007/Papers/WWS_Alejandro_Sanchez.pdf'},
+    {label:'Gourlay (1996)',url:'https://doi.org/10.1016/0378-3839(96)00009-9'},
+    {label:'Seelig (1983)',url:'https://doi.org/10.1061/(ASCE)0733-950X(1983)109:4(380)'},
+  ],
+  'fall-velocity':[
+    {label:'Ferguson and Church (2004)',url:'https://doi.org/10.1306/051204740933'},
+    {label:'Soulsby (1997)',url:'https://doi.org/10.1680/doms.25844'},
+  ],
+  'bed-shear':[{label:'Soulsby (1997)',url:'https://doi.org/10.1680/doms.25844'}],
+  'critical-current':[{label:'Soulsby (1997)',url:'https://doi.org/10.1680/doms.25844'}],
+  'critical-shear':[{label:'Soulsby (1997)',url:'https://doi.org/10.1680/doms.25844'}],
+  'critical-orbital':[{label:'Komar and Miller (1975)',url:'https://doi.org/10.9753/icce.v14.44'}],
+  'beach-slope':[{label:'Bujan et al. (2019)',url:'https://doi.org/10.1016/j.margeo.2019.106012'}],
+  'sediment-density':[
+    {label:'Van Rijn (1993)',url:'https://openlibrary.org/books/OL14897011M/Principles_of_sediment_transport_in_rivers_estuaries_and_coastal_seas'},
+    {label:'Lara and Pemberton (1963) archive record',url:'https://archives.colostate.edu/repositories/2/archival_objects/78261'},
+  ],
+  'wind-setup':[{label:'Saville (1952), USACE Technical Memorandum No. 27',url:'https://usace.contentdm.oclc.org/digital/api/collection/p266001coll1/id/7551/download'}],
+  'rock-sizing':[
+    {label:'Van der Meer (1988)',url:'https://repository.tudelft.nl/record/uuid:67e5692c-0905-4ddd-8487-37fdda9af6b4'},
+    {label:'The Rock Manual (2007)',url:'https://kennisbank-waterbouw.nl/DesignCodes/rockmanual/introduction%20.pdf'},
+  ],
+  'overtopping':[{label:'EurOtop (2018) manual (PDF)',url:'https://www.overtopping-manual.com/assets/downloads/EurOtop_II_2018_Final_version.pdf'}],
+  'submerged-breakwater':[{label:'Seabrook and Hall (1999)',url:'https://doi.org/10.1061/9780784404119.150'}],
+  'reef-balls':[{label:'Buccino et al. (2014)',url:'https://doi.org/10.1061/(ASCE)WW.1943-5460.0000237'}],
 }
 const config=configs[props.id];const stored=JSON.parse(localStorage.getItem(`marine-calculators:${props.id}:v1`)??'{}');const values=reactive<Record<string,number>>(Object.fromEntries(config.fields.map(f=>[f.key,stored[f.key]??f.value])));watch(values,v=>localStorage.setItem(`marine-calculators:${props.id}:v1`,JSON.stringify(v)),{deep:true});const result=computed(()=>config.calculate(values));const sweepKey=ref(config.fields[0].key);const outputKey=ref(config.outputs.find(o=>typeof result.value[o.key]==='number')?.key??config.outputs[0].key);const inputField=computed(()=>config.fields.find(f=>f.key===sweepKey.value)!);const outputField=computed(()=>config.outputs.find(o=>o.key===outputKey.value)!);const axisLabel=(label:string,unit?:string)=>unit?`${label} (${unit})`:label;const sweep=computed(()=>{const base=values[sweepKey.value];const field=inputField.value;const lo=Math.max(field.min??0,base*.25||.000001);const hi=Math.max(base*2,lo*2);return linspace(lo,hi,80).map(x=>({x,y:Number(config.calculate({...values,[sweepKey.value]:x})[outputKey.value])}))});const chartData=computed(()=>{const xUnit=inputField.value.unit?` ${inputField.value.unit}`:'';const yUnit=outputField.value.unit?` ${outputField.value.unit}`:'';return[{x:sweep.value.map(p=>p.x),y:sweep.value.map(p=>p.y),type:'scatter' as const,mode:'lines' as const,line:{color:'#0879bd',width:2},hovertemplate:`${inputField.value.label}: %{x:.4g}${xUnit}<br>${outputField.value.label}: %{y:.4g}${yUnit}<extra></extra>`},{x:[values[sweepKey.value]],y:[Number(result.value[outputKey.value])],type:'scatter' as const,mode:'markers' as const,marker:{color:'#111',size:9},hovertemplate:`Current case<br>${inputField.value.label}: %{x:.4g}${xUnit}<br>${outputField.value.label}: %{y:.4g}${yUnit}<extra></extra>`}]});function display(key:string,digits=3){const v=result.value[key];if(typeof v==='boolean')return v?'Yes':'No';if(typeof v==='string')return v;return Number.isFinite(v)?Number(v).toFixed(digits):'Not applicable'}
 function fieldTip(f:Field){const key=f.key.toLowerCase();const label=f.label.toLowerCase();if(key==='h'||label.includes('wave height'))return 'Vertical distance from trough to crest for the wave condition used by this calculation.';if(key==='t'||label.includes('wave period'))return 'Time between successive wave crests. It controls wavelength and the duration of wave-induced motion.';if(label.includes('depth'))return 'Still-water depth at the location specified by this calculator.';if(label.includes('density'))return 'Mass per unit volume. Use values representative of the local material or water conditions.';if(label.includes('grain')||label.includes('diameter')||key==='d')return 'Representative sediment or armour size used by the empirical relationship.';if(label.includes('angle'))return 'Angle in degrees. Check the page background for the reference direction and applicable range.';if(label.includes('slope'))return 'Slope measure used by the governing relationship; check whether it is entered as an angle, tangent or ratio.';if(label.includes('wind speed'))return 'Wind speed used by the empirical method, normally referenced to 10 m above the water surface.';if(label.includes('fetch')||label.includes('width'))return 'Effective distance over which the process acts in the stated direction.';if(label.includes('duration'))return 'Length of time for which the stated forcing or storm condition persists.';if(label.includes('factor')||label.includes('parameter')||label.includes('permeability'))return 'Dimensionless empirical input. The background section explains its physical meaning and recommended values.';if(label.includes('percentage'))return 'Percentage by mass used to describe the sediment mixture; component percentages should total 100%.';return `Input used by the ${config.title} calculation. Units and applicability are described in the background section.`}
@@ -299,6 +333,6 @@ onMounted(async()=>{await nextTick();const el=document.querySelector('.remaining
         </div>
       </article>
     </div>
-    <article class="background-panel"><div class="background-title"><h2>Background</h2><span>−</span></div><div class="background-body remaining-background"><p>{{ config.background }}</p><p v-if="id==='wind-setup'"><a href="https://usace.contentdm.oclc.org/digital/api/collection/p266001coll1/id/7551/download" target="_blank" rel="noopener">Read Saville (1952), USACE Technical Memorandum No. 27 <span aria-hidden="true">↗</span></a></p><p v-else-if="id==='beach-slope'"><a href="https://doi.org/10.1016/j.margeo.2019.106012" target="_blank" rel="noopener">Open the Bujan et al. (2019) reference <span aria-hidden="true">↗</span></a></p><p v-else-if="id==='reef-balls'"><a href="https://doi.org/10.1061/(ASCE)WW.1943-5460.0000237" target="_blank" rel="noopener">Open the Buccino et al. (2014) reference <span aria-hidden="true">↗</span></a></p></div></article>
+    <article class="background-panel"><div class="background-title"><h2>Background</h2><span>−</span></div><div class="background-body remaining-background"><p>{{ config.background }}</p><p v-if="referenceLinks[id]?.length" class="reference-links"><strong>Online references</strong><br /><template v-for="(reference,index) in referenceLinks[id]" :key="reference.url"><a :href="reference.url" target="_blank" rel="noopener">{{ reference.label }} <span aria-hidden="true">↗</span></a><br v-if="index < referenceLinks[id]!.length-1" /></template></p></div></article>
   </section>
 </template>

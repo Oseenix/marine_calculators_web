@@ -44,6 +44,7 @@ const chartData=computed(()=>[
       <div class="equation">H₀.₁% = Hm0 √(ln 1000 / 2) (1 + Hm0/h)⁻¹ᐟ²</div>
       <p>The method is attractive because it needs only Hm0 and water depth. It was based on physical-model tests and a limited prototype check, so it is best treated as a transparent screening calculation. The later Battjes–Groenendijk (2000) composite Weibull distribution is more widely used for shallow foreshores and can predict a broader set of exceedance statistics, but it also needs foreshore information and a more involved solution. A separate <button class="inline-link" type="button" @click="emit('navigate','battjes-groenendijk')">Battjes–Groenendijk calculator</button> is included for that method.</p>
       <p>Only H₁% and H₀.₁% are presented as Stive results because those are the two published correction equations. The Rayleigh values show what the same sea state would produce without the shallow-water correction.</p>
+      <p><strong>Reference</strong><br /><a href="https://repository.tudelft.nl/record/uuid:84ef8201-1130-418f-954a-79a80c626173" target="_blank" rel="noopener">Klopman, G. &amp; Stive, M. J. F. (1989). Extreme waves and wave loading in shallow water.</a></p>
     </div></article>
   </section>
 </template>
