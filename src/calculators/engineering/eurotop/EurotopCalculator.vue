@@ -121,7 +121,7 @@ onMounted(async()=>{await nextTick();const el=document.querySelector('.eurotop-b
         <p>A vertical wall has no seaward slope on which to define $R_{u2\%}$, so the calculator reports overtopping probability directly rather than a run-up level.</p>
       </template>
       <h3>Using the results</h3><ul><li>The sensitivity plot reruns the complete decision process, so it may cross from one governing equation to another.</li><li>Mean discharge, percentage of waves overtopping and individual overtopping volume describe different hazards and should not be interchanged.</li><li>Results outside the automated checks require closer review of EurOtop geometry limits, influence factors and physical-model evidence.</li></ul>
-      <p><strong>Source:</strong> EurOtop (2018), <em>Manual on wave overtopping of sea defences and related structures</em>, {{ section }}.</p>
+      <p><strong>Source:</strong> EurOtop (2018), <em>Manual on wave overtopping of sea defences and related structures</em>, {{ section }}. <a href="https://www.overtopping-manual.com/assets/downloads/EurOtop_II_2018_Final_version.pdf" target="_blank" rel="noopener">Download the official manual (PDF) <span aria-hidden="true">↗</span></a></p>
     </div></article>
   </section>
 </template>
