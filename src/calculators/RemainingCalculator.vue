@@ -146,7 +146,9 @@ Reference: Soulsby, R. L. (1997). Dynamics of Marine Sands. Thomas Telford.`,
 
 $\\beta=-0.178(d_{50,mm}-0.125)^{-0.187}+0.294$
 
-where $d_{50,mm}$ is median grain size in millimetres. The relationship should not be extrapolated below 0.125 mm, where the fractional power becomes undefined in real arithmetic. It is an empirical estimate rather than a substitute for a surveyed beach profile.`,
+where $d_{50,mm}$ is median grain size in millimetres. The relationship should not be extrapolated below 0.125 mm, where the fractional power becomes undefined in real arithmetic. It is an empirical estimate rather than a substitute for a surveyed beach profile.
+
+Reference: Bujan, N., Cox, R., & Masselink, G. (2019). From fine sand to boulders: Examining the relationship between beach-face slope and sediment size. *Marine Geology*, 417, 106012.`,
   'sediment-density': `Dry bulk density is estimated from the percentages of sand, silt and clay:
 
 $\\rho_{dry}=1550p_{sand}+1120p_{silt}+415p_{clay}$
@@ -246,7 +248,9 @@ For $R^*\\ge0.7$:
 
 $K_t=\\frac{1}{1+0.3(R^*)^{-1.5}b^*}$
 
-The calculator linearly blends the two expressions for $0.4<R^*<0.7$. Percentage wave reduction is $(1-K_t)\\times100\\%$. The relationship is empirical and should be used within the geometric and wave conditions represented by its source data.`
+The calculator linearly blends the two expressions for $0.4<R^*<0.7$. Percentage wave reduction is $(1-K_t)\\times100\\%$. The relationship is empirical and should be used within the geometric and wave conditions represented by its source data.
+
+Reference: Buccino, M., Del Vita, I., & Calabrese, M. (2014). Engineering modeling of wave transmission of Reef Balls. *Journal of Waterway, Port, Coastal, and Ocean Engineering*, 140(4), 04014010. The equations were validated against more than 300 physical-model observations from two laboratories.`
 }
 for (const [id, background] of Object.entries(fullBackgrounds)) configs[id as RemainingId].background = background
 const backgroundImages: Partial<Record<RemainingId,{src:string;alt:string;caption:string}[]>> = {
@@ -295,6 +299,6 @@ onMounted(async()=>{await nextTick();const el=document.querySelector('.remaining
         </div>
       </article>
     </div>
-    <article class="background-panel"><div class="background-title"><h2>Background</h2><span>−</span></div><div class="background-body remaining-background"><p>{{ config.background }}</p><p v-if="id==='wind-setup'"><a href="https://usace.contentdm.oclc.org/digital/api/collection/p266001coll1/id/7551/download" target="_blank" rel="noopener">Read Saville (1952), USACE Technical Memorandum No. 27 <span aria-hidden="true">↗</span></a></p></div></article>
+    <article class="background-panel"><div class="background-title"><h2>Background</h2><span>−</span></div><div class="background-body remaining-background"><p>{{ config.background }}</p><p v-if="id==='wind-setup'"><a href="https://usace.contentdm.oclc.org/digital/api/collection/p266001coll1/id/7551/download" target="_blank" rel="noopener">Read Saville (1952), USACE Technical Memorandum No. 27 <span aria-hidden="true">↗</span></a></p><p v-else-if="id==='beach-slope'"><a href="https://doi.org/10.1016/j.margeo.2019.106012" target="_blank" rel="noopener">Open the Bujan et al. (2019) reference <span aria-hidden="true">↗</span></a></p><p v-else-if="id==='reef-balls'"><a href="https://doi.org/10.1061/(ASCE)WW.1943-5460.0000237" target="_blank" rel="noopener">Open the Buccino et al. (2014) reference <span aria-hidden="true">↗</span></a></p></div></article>
   </section>
 </template>

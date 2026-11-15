@@ -140,6 +140,8 @@ input:focus, select:focus { outline: 2px solid rgb(0 123 255 / 18%); border-colo
 .eurotop-background h3 { margin: 18px 0 7px; font-size: .92rem; }
 .eurotop-background ul { margin: 4px 0 14px; padding-left: 23px; }
 .eurotop-background li { margin-bottom: 5px; }
+.equation-guide { margin: 10px 0 16px; padding: 10px 12px; border-left: 3px solid #3c94bf; background: #f2f8fb; font-size: .78rem; line-height: 1.5; }
+.equation-guide > strong { display: block; margin-bottom: 5px; }.equation-guide ul { margin: 0; }
 .applicability-ok, .applicability-warning { margin: 0 11px 14px; padding: 9px 10px; font-size: .75rem; line-height: 1.4; }
 .applicability-ok { border-left: 3px solid #2f8f5f; background: #edf8f1; }
 .applicability-warning { border-left: 3px solid #c83f34; background: #fff0ee; }

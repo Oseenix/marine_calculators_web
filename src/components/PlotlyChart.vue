@@ -21,7 +21,7 @@ async function render() {
     plot_bgcolor: '#ffffff',
     font: { family: 'Arial, sans-serif', color: '#111111' },
     xaxis: { showline: true, showgrid: true, automargin: true, tickmode: 'auto', nticks: 7, ticks: 'outside', mirror: true, linecolor: '#111111', linewidth: 1, gridcolor: '#dedede', gridwidth: 1, zerolinecolor: '#777777', minor: { showgrid: true, gridcolor: '#f0f0f0', ticks: 'outside' }, ...props.layout.xaxis },
-    yaxis: { showline: true, showgrid: true, automargin: true, tickformat: '.4~g', tickmode: 'auto', nticks: 7, ticks: 'outside', mirror: true, linecolor: '#111111', linewidth: 1, gridcolor: '#dedede', gridwidth: 1, zerolinecolor: '#777777', minor: { showgrid: true, gridcolor: '#f0f0f0', ticks: 'outside' }, ...props.layout.yaxis },
+    yaxis: { showline: true, showgrid: true, automargin: true, tickformat: '.4~g', ...({ minorloglabels: 'none' } as any), tickmode: 'auto', nticks: 7, ticks: 'outside', mirror: true, linecolor: '#111111', linewidth: 1, gridcolor: '#dedede', gridwidth: 1, zerolinecolor: '#777777', minor: { showgrid: true, gridcolor: '#f0f0f0', ticks: 'outside' }, ...props.layout.yaxis },
   }, {
     responsive: true,
     displaylogo: false,
