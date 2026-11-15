@@ -34,7 +34,7 @@ const chartData = computed(() => [
         <div><dt>H0.1% <InfoTip text="Individual wave height exceeded by 0.1% of waves, or about one wave in 1,000." /></dt><dd>{{ result.h01Percent.toFixed(3) }} m</dd></div>
       </dl><div :class="result.clamped || values.cotSlope<20 || values.cotSlope>250?'applicability-warning':'applicability-ok'">{{ result.clamped?'Htr/Hrms is outside the published table range (0.05–3.0); the nearest tabulated limit is being used.':values.cotSlope<20 || values.cotSlope>250?'The foreshore slope is outside the principal calibration range of 1:20 to 1:250.':'The transition ratio and foreshore slope lie within the published ranges.' }}</div></article>
       <article class="panel charts-panel"><div class="panel-title graphical-title"><h2>Graphical</h2></div><div class="graphical-body eurotop-graphical">
-        <PlotlyChart :data="chartData" :layout="{barmode:'group',xaxis:{title:{text:'Characteristic wave height'}},yaxis:{title:{text:'Wave height (m)'},rangemode:'tozero'},legend:{orientation:'h'}}" />
+        <PlotlyChart :data="chartData" :layout="{barmode:'group',margin:{t:58,b:66},xaxis:{title:{text:'Characteristic wave height',standoff:12}},yaxis:{title:{text:'Wave height (m)'},rangemode:'tozero'},legend:{orientation:'h',x:.5,xanchor:'center',y:1.16,yanchor:'bottom'}}" />
       </div></article>
     </div>
     <article class="background-panel"><div class="background-title"><h2>Background and applicability</h2><span>−</span></div><div class="background-body">

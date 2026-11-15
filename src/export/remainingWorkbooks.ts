@@ -54,7 +54,7 @@ const specs: Partial<Record<RemainingId, WorkbookSpec>> = {
     ],
   },
   'wind-setup': {
-    title:'Wind Setup in an Enclosed Water Body', filename:'enclosed-water-wind-setup.xlsx', note:'Assumes a uniform enclosed water body and constant wind acting along the fetch.', reference:'Relationship and coefficient transferred from the original Shiny application.',
+    title:'Wind Setup in an Enclosed Water Body', filename:'enclosed-water-wind-setup.xlsx', note:'Reports approximate leeward-end rise as half the total windward-to-leeward setup; assumes steady aligned wind and a near-rectangular basin.', reference:'Saville, T. Jr. (1952), Wind Set-up and Waves in Shallow Water, USACE Technical Memorandum No. 27.',
     columns:[{key:'wind',label:'Wind speed, U10 (m/s)',kind:'input',min:0},{key:'depth',label:'Average depth, h (m)',kind:'input',min:0.000001},{key:'fetch',label:'Fetch, F (m)',kind:'input',min:0},{label:'Wind setup (m)',kind:'output',formula:r=>`IF(OR(B${r}="",C${r}="",D${r}=""),"",0.5*3.5E-6*(B${r}^2/(9.81*C${r}))*D${r})`}],
   },
   'critical-current': {

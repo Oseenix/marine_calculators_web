@@ -16,12 +16,12 @@ async function render() {
   await plotly.react(element.value, props.data, {
     ...props.layout,
     autosize: true,
-    margin: { l: 58, r: 18, t: 24, b: 52, ...props.layout.margin },
+    margin: { l: 86, r: 22, t: 28, b: 66, ...props.layout.margin },
     paper_bgcolor: '#ffffff',
     plot_bgcolor: '#ffffff',
     font: { family: 'Arial, sans-serif', color: '#111111' },
-    xaxis: { showline: true, showgrid: true, tickmode: 'auto', nticks: 7, ticks: 'outside', mirror: true, linecolor: '#111111', linewidth: 1, gridcolor: '#dedede', gridwidth: 1, zerolinecolor: '#777777', minor: { showgrid: true, gridcolor: '#f0f0f0', ticks: 'outside' }, ...props.layout.xaxis },
-    yaxis: { showline: true, showgrid: true, tickmode: 'auto', nticks: 7, ticks: 'outside', mirror: true, linecolor: '#111111', linewidth: 1, gridcolor: '#dedede', gridwidth: 1, zerolinecolor: '#777777', minor: { showgrid: true, gridcolor: '#f0f0f0', ticks: 'outside' }, ...props.layout.yaxis },
+    xaxis: { showline: true, showgrid: true, automargin: true, tickmode: 'auto', nticks: 7, ticks: 'outside', mirror: true, linecolor: '#111111', linewidth: 1, gridcolor: '#dedede', gridwidth: 1, zerolinecolor: '#777777', minor: { showgrid: true, gridcolor: '#f0f0f0', ticks: 'outside' }, ...props.layout.xaxis },
+    yaxis: { showline: true, showgrid: true, automargin: true, tickformat: '.4~g', tickmode: 'auto', nticks: 7, ticks: 'outside', mirror: true, linecolor: '#111111', linewidth: 1, gridcolor: '#dedede', gridwidth: 1, zerolinecolor: '#777777', minor: { showgrid: true, gridcolor: '#f0f0f0', ticks: 'outside' }, ...props.layout.yaxis },
   }, {
     responsive: true,
     displaylogo: false,
