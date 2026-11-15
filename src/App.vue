@@ -67,7 +67,6 @@ function selectCalculator(id: CalculatorId) {
           <button type="button" @click="selectCalculator('eurotop-rubble')">Armoured Rubble Slopes and Mounds</button>
           <button type="button" @click="selectCalculator('eurotop-vertical')">Vertical and Steep Walls</button>
         </div></div>
-        <button type="button" @click="selectCalculator('overtopping')">Runup and Overtopping of Revetments</button>
         <button type="button" @click="selectCalculator('submerged-breakwater')">Transmission over Submerged Breakwater</button>
         <button type="button" @click="selectCalculator('reef-balls')">Transmission over Reef Balls</button>
       </div></div>

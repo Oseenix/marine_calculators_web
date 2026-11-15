@@ -65,7 +65,8 @@ export function smoothOvertopping(hm0: number, period: number, rc: number, cotAl
   const overtoppingProbability = Math.exp(-((Math.sqrt(-Math.log(0.02)) * rc / runup2) ** 2))
   if (cotAlpha < 2) warnings.push('The general gentle-slope method is intended primarily for slopes 1:2 and gentler.')
   if (combinedFactor < 0.4) warnings.push('The combined influence factor is below 0.4; EurOtop recommends further research in this range.')
-  return result(Math.min(qBreak, qMax), { xi, runup2, overtoppingProbability, overtoppingProbabilityEquation: '5.56', regime: qBreak <= qMax ? 'Breaking-wave equation' : 'Non-breaking maximum', equations: design ? '5.12 / 5.13' : '5.10 / 5.11', applicable: warnings.length === 0, warnings }, hm0)
+  const breakingGoverns = qBreak <= qMax
+  return result(Math.min(qBreak, qMax), { xi, runup2, overtoppingProbability, overtoppingProbabilityEquation: '5.56', regime: breakingGoverns ? 'Breaking-wave equation' : 'Non-breaking maximum', equations: design ? (breakingGoverns ? '5.12' : '5.13') : (breakingGoverns ? '5.10' : '5.11'), applicable: warnings.length === 0, warnings }, hm0)
 }
 
 export function rubbleOvertopping(hm0: number, period: number, rc: number, cotAlpha: number, gammaF: number, gammaBeta: number, approach: EurotopApproach, permeableCore: boolean): EurotopResult {
@@ -86,7 +87,7 @@ export function rubbleOvertopping(hm0: number, period: number, rc: number, cotAl
   if (cotAlpha < 1.333 || cotAlpha > 2) warnings.push('The steep armoured-slope method is intended for slopes from about 1:1.33 to 1:2.')
   if (xi < 2.8 || xi > 4.5) warnings.push('The Table 6.2 roughness factors were derived mainly for breaker parameters between 2.8 and 4.5.')
   warnings.push('EurOtop Equation 6.3 gives an upper estimate of the percentage of waves that actually overtop a rubble-mound crest.')
-  return result(qNd, { xi, gammaFModified, runup2, overtoppingProbability, overtoppingProbabilityEquation: '6.3', regime: xi > 5 ? 'Steep armoured slope with modified roughness' : 'Steep armoured slope', equations: design ? '6.6 (and 6.7 where ξ > 5)' : '6.5 (and 6.7 where ξ > 5)', applicable: warnings.length === 1, warnings }, hm0)
+  return result(qNd, { xi, gammaFModified, runup2, overtoppingProbability, overtoppingProbabilityEquation: '6.3', regime: xi > 5 ? 'Steep armoured slope with modified roughness' : 'Steep armoured slope', equations: `${design ? '6.6' : '6.5'}${xi > 5 ? ' + 6.7' : ''}`, applicable: warnings.length === 1, warnings }, hm0)
 }
 
 export function verticalOvertopping(hm0: number, period: number, rc: number, depth: number, influencingForeshore: boolean, approach: EurotopApproach): EurotopResult {

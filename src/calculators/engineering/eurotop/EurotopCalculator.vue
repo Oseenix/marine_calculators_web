@@ -20,12 +20,14 @@ function calculate(overrides:Partial<typeof values>={}){
   return verticalOvertopping(v.hm0,v.period,v.rc,v.depth,v.influencingForeshore,v.approach)
 }
 const result=computed(()=>calculate())
-const sweep=computed(()=>{const centre=values[vary.value];const lo=vary.value==='rc'?0:Math.max(.05,centre*.45);const hi=vary.value==='rc'?Math.max(1,centre*2):centre*1.55;return linspace(lo,hi,80).map(x=>({x,q:calculate({[vary.value]:x}).q*1000}))})
+const sweep=computed(()=>{const centre=values[vary.value];const lo=vary.value==='rc'?0:Math.max(.05,centre*.45);const hi=vary.value==='rc'?Math.max(1,centre*2):centre*1.55;return linspace(lo,hi,120).map(x=>{const r=calculate({[vary.value]:x});return{x,q:r.q*1000,regime:r.regime,equations:r.equations}})})
+const transitions=computed(()=>sweep.value.slice(1).flatMap((point,index)=>{const previous=sweep.value[index];return point.regime!==previous.regime||point.equations!==previous.equations?[{x:(point.x+previous.x)/2,label:point.regime,equations:point.equations}]:[]}))
 const chartData=computed(()=>[
   {x:sweep.value.map(x=>x.x),y:sweep.value.map(x=>x.q),type:'scatter' as const,mode:'lines' as const,line:{color:'#0879bd',width:2},hovertemplate:`${varyLabel.value}: %{x:.3g}<br>Discharge: %{y:.3g} L/s/m<extra></extra>`},
   {x:[values[vary.value]],y:[result.value.q*1000],type:'scatter' as const,mode:'markers' as const,marker:{color:'#111',size:9},hovertemplate:'Current case<br>%{y:.3g} L/s/m<extra></extra>'},
 ])
 const varyLabel=computed(()=>vary.value==='rc'?'Crest freeboard, Rc (m)':vary.value==='hm0'?'Wave height, Hm0 (m)':'Wave period, Tm-1,0 (s)')
+const chartLayout=computed(()=>({xaxis:{title:{text:varyLabel.value}},yaxis:{title:{text:'Mean discharge, q (L/s/m)'},type:'log'},showlegend:false,shapes:transitions.value.map(t=>({type:'line',xref:'x',yref:'paper',x0:t.x,x1:t.x,y0:0,y1:1,line:{color:'#8b3a3a',width:1.5,dash:'dash'}})),annotations:transitions.value.map((t,i)=>({xref:'x',yref:'paper',x:t.x,y:1,xanchor:i%2?'right':'left',yanchor:'bottom',text:`${t.label}<br><span style="font-size:10px">Eq. ${t.equations}</span>`,showarrow:false,font:{size:10,color:'#6d2424'},bgcolor:'rgba(255,255,255,.85)',borderpad:2}))}))
 const armour=ref('Rock, 2 layers, permeable core')
 function setArmour(){values.gammaF=roughnessCatalogue[armour.value]}
 onMounted(async()=>{await nextTick();const el=document.querySelector('.eurotop-background');if(el)renderMathInElement(el as HTMLElement,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})})
@@ -74,7 +76,7 @@ onMounted(async()=>{await nextTick();const el=document.querySelector('.eurotop-b
         <div v-if="result.impulseParameter!==undefined"><dt>Impulse Classifier <button class="info-tip" type="button" data-tip="Dimensionless h²/(Hm0 Lm-1,0). Values above 0.23 indicate non-impulsive attack; smaller values indicate increasingly impulsive breaking at the wall.">i</button></dt><dd>{{ result.impulseParameter.toFixed(3) }}</dd></div>
       </dl><div :class="result.applicable?'applicability-ok':'applicability-warning'">{{ result.applicable?'Inputs pass the automated applicability checks.':result.warnings.join(' ') }}</div><p v-if="family==='rubble'" class="method-note">Equation 6.3 is an upper estimate: run-up on the front slope is not identical to water passing the crest, particularly where a crest berm or crown wall is present.</p></article>
       <article class="panel charts-panel"><div class="panel-title graphical-title"><h2>Graphical</h2></div><div class="graphical-body eurotop-graphical">
-        <PlotlyChart :data="chartData" :layout="{xaxis:{title:{text:varyLabel}},yaxis:{title:{text:'Mean discharge, q (L/s/m)'},type:'log'},showlegend:false}" />
+        <PlotlyChart :data="chartData" :layout="chartLayout" />
         <div class="select-row eurotop-controls"><label>Vary Input<select v-model="vary"><option value="rc">Crest freeboard</option><option value="hm0">Wave height</option><option value="period">Wave period</option></select></label></div>
         <figure class="structure-figure"><img class="structure-diagram" :src="image" :alt="`${title} geometry`" /><figcaption>Representative EurOtop geometry and parameter definitions.</figcaption></figure>
       </div></article>

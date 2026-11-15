@@ -128,6 +128,7 @@ input:focus, select:focus { outline: 2px solid rgb(0 123 255 / 18%); border-colo
 .profile-card-body a, .resources-page a { color: #176a94; }
 .eurotop-section { margin: 5px 0 0; color: #555; font-size: .82rem; }
 .check-label { display: flex !important; align-items: center; gap: 8px; padding-bottom: 0 !important; }
+.input-panel > .check-label:last-of-type { padding-bottom: 18px !important; }
 .check-label input { width: auto; margin: 0; }
 .eurotop-graphical { display: grid; grid-template-columns: minmax(420px,1.6fr) minmax(210px,.55fr); gap: 20px 24px; }
 .eurotop-controls { padding: 29px 10px 0 0; }

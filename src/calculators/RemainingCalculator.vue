@@ -24,8 +24,8 @@ const configs:Record<RemainingId,Config>={
  'wind-setup':{title:'Wind Setup in an Enclosed Water Body',fields:[{key:'wind',label:'Wind Speed',unit:'m/s',value:25},{key:'depth',label:'Average Depth',unit:'m',value:1},{key:'fetch',label:'Fetch',unit:'m',value:4000}],calculate:v=>({setup:enclosedWindSetup(v.wind,v.depth,v.fetch)}),outputs:[{key:'setup',label:'Wind Setup',unit:'m',digits:3}],background:'Wind setup is calculated as $\\eta=\\tfrac12k(U_{10}^2/gh)F$, with $k=3.5\\times10^{-6}$.'},
  'rock-sizing':{title:'Rock Sizing for Double Layer Sea Dikes and Revetments',fields:[['H','Significant Wave Height','m',2.5],['periodType','Wave Period Characterisation','',1],['T','Wave Period','s',16],['rhoS','Rock Density','kg/m³',2700],['rhoW','Water Density','kg/m³',1025],['S','Damage Parameter','',2],['P','Notional Permeability','',.4],['duration','Storm Duration','hours',9.6],['alpha','Slope Angle','deg',14],['waveAngle','Wave Angle','deg',0],['safety','Safety Factor','',1.1],['depth','Depth at Toe','m',3]].map(([key,label,unit,value])=>({key:key as string,label:label as string,unit:unit as string,value:value as number,min:0})),calculate:v=>rockSizing(v.H,v.T,v.rhoS,v.rhoW,v.S,v.P,v.duration*3600/v.T,v.alpha,v.depth,v.waveAngle,v.safety,Boolean(v.periodType)),outputs:[{key:'xi',label:'Surf Similarity Parameter',digits:3},{key:'waves',label:'Number of Waves',digits:0},{key:'steepness',label:'Wave Steepness',digits:4},{key:'wavelength',label:'Deep Water Wavelength',unit:'m',digits:2},{key:'diameter',label:'Rock Diameter Dn50',unit:'m',digits:2}],background:'Nominal armour diameter follows Van der Meer (1988) for two-layer, non-overtopped rock slopes, including permeability, damage, storm duration, depth, obliquity and safety factors.'},
  'overtopping':{title:'Runup/Overtopping of Sea Dikes and Revetments',fields:[['H','Significant Wave Height at Toe','m',2.5],['T','Wave Period','s',9],['alpha','Slope Angle','deg',20],['waveAngle','Wave Angle','deg',0],['runupSafety','Runup Safety Factor','',1.1],['overtopSafety','Overtopping Safety Factor','',1.5],['rough','Slope Roughness Factor','',.9],['berm','Berm Factor','',1],['Rc','Crest Level Above SWL','m',8.5]].map(([key,label,unit,value])=>({key:key as string,label:label as string,unit:unit as string,value:value as number,min:0})),calculate:v=>overtopping(v.H,v.T,v.alpha,v.waveAngle,v.runupSafety,v.overtopSafety,v.rough,v.berm,v.Rc),outputs:[{key:'xi',label:'Surf Similarity Parameter',digits:3},{key:'runup',label:'2% Runup',unit:'m',digits:2},{key:'rate',label:'Overtopping Rate',unit:'litres/m/s',digits:4},{key:'percentage',label:'Percentage Overtopping',unit:'%',digits:2}],background:'Runup and mean overtopping discharge follow the EurOtop formulations used in the original application, including slope roughness, berm, wave-angle and safety factors.'},
- 'submerged-breakwater':{title:'Wave Transmission over Submerged Breakwater',fields:[['H','Wave Height','m',2],['L','Wave Length','m',150],['depth','Submergence Depth','m',.5],['width','Reef Width','m',15],['d50','Core Median Rock Size','m',.5]].map(([key,label,unit,value])=>({key:key as string,label:label as string,unit:unit as string,value:value as number,min:.000001})),calculate:v=>submergedTransmission(v.H,v.L,v.depth,v.width,v.d50),outputs:[{key:'coefficient',label:'Transmission Coefficient',digits:2},{key:'reduction',label:'Wave Reduction',unit:'%',digits:0},{key:'inRange',label:'Variables Within Calibration Range'}],background:'Transmission follows the empirical submerged-breakwater relationship used in the Shiny app. A warning is shown when either calibration parameter is outside its published range.'},
- 'reef-balls':{title:'Wave Transmission over Reef Balls',fields:[['H','Wave Height','m',1.5],['L','Wave Length','m',150],['depth','Submergence Depth','m',.5],['width','Peak-to-Peak Array Width','m',15]].map(([key,label,unit,value])=>({key:key as string,label:label as string,unit:unit as string,value:value as number,min:.000001})),calculate:v=>reefBallTransmission(v.H,v.L,v.depth,v.width),outputs:[{key:'coefficient',label:'Transmission Coefficient',digits:2},{key:'reduction',label:'Wave Reduction',unit:'%',digits:0}],background:'The transmission coefficient is calculated from relative submergence and dimensionless array width, with interpolation through the transition range.'}
+ 'submerged-breakwater':{title:'Wave Transmission over Submerged Breakwater',fields:[['H','Wave Height','m',2],['T','Wave Period','s',9.8],['depth','Submergence Depth','m',.5],['width','Reef Width','m',15],['d50','Core Median Rock Size','m',.5]].map(([key,label,unit,value])=>({key:key as string,label:label as string,unit:unit as string,value:value as number,min:.000001})),calculate:v=>({...submergedTransmission(v.H,deepWaterWavelength(v.T),v.depth,v.width,v.d50),wavelength:deepWaterWavelength(v.T)}),outputs:[{key:'coefficient',label:'Transmission Coefficient',digits:2},{key:'reduction',label:'Wave Reduction',unit:'%',digits:0},{key:'wavelength',label:'Calculated Deep-Water Wavelength',unit:'m',digits:2},{key:'inRange',label:'Variables Within Calibration Range'}],background:'Transmission follows the empirical submerged-breakwater relationship used in the Shiny app. Wavelength is calculated from period as the deep-water wavelength. A warning is shown when either calibration parameter is outside its published range.'},
+ 'reef-balls':{title:'Wave Transmission over Reef Balls',fields:[['H','Wave Height','m',1.5],['T','Wave Period','s',9.8],['depth','Submergence Depth','m',.5],['width','Peak-to-Peak Array Width','m',15]].map(([key,label,unit,value])=>({key:key as string,label:label as string,unit:unit as string,value:value as number,min:.000001})),calculate:v=>({...reefBallTransmission(v.H,deepWaterWavelength(v.T),v.depth,v.width),wavelength:deepWaterWavelength(v.T)}),outputs:[{key:'coefficient',label:'Transmission Coefficient',digits:2},{key:'reduction',label:'Wave Reduction',unit:'%',digits:0},{key:'wavelength',label:'Calculated Deep-Water Wavelength',unit:'m',digits:2}],background:'The transmission coefficient is calculated from relative submergence and dimensionless array width. The incident deep-water wavelength is calculated from wave period, with interpolation through the transition range.'}
 }
 const fullBackgrounds: Record<RemainingId,string> = {
   'wave-setup': `Wave setup and runup on a planar beach are calculated using Stockdon et al. (2006). The deep-water wavelength is
@@ -202,15 +202,19 @@ The wave-angle factor is $\\gamma_\\beta=0.5+0.5\\cos^2\\beta$. Mean overtopping
 $P_{ov}=100\\exp[-3.91R_c^2/R_{2\\%}^2]$
 
 Reference: EurOtop (2018). Manual on wave overtopping of sea defences and related structures.`,
-  'submerged-breakwater': `Wave transmission over a submerged rubble-mound breakwater is calculated as
+  'submerged-breakwater': `Wave transmission over a submerged rubble-mound breakwater uses the deep-water wavelength calculated from wave period:
 
-$K_t=1-\\left[\\exp\\left(-0.65\\frac{d_s}{H}-1.09\\frac{H}{B}\\right)+0.047\\frac{Bd_s}{Ld_{50}}-0.067\\frac{d_sH}{Bd_{50}}\\right]$
+$L_0=\\frac{gT^2}{2\\pi}$
 
-where $H$ and $L$ are incident wave height and wavelength, $d_s$ is submergence depth, $B$ is crest width and $d_{50}$ is median core-rock size. Wave reduction is $(1-K_t)\\times100\\%$.
+The transmission coefficient is
+
+$K_t=1-\\left[\\exp\\left(-0.65\\frac{d_s}{H}-1.09\\frac{H}{B}\\right)+0.047\\frac{Bd_s}{L_0d_{50}}-0.067\\frac{d_sH}{Bd_{50}}\\right]$
+
+where $H$ and $T$ are incident wave height and period, $d_s$ is submergence depth, $B$ is crest width and $d_{50}$ is median core-rock size. Wave reduction is $(1-K_t)\\times100\\%$. A local wavelength would require total water depth at the structure; crest submergence is not the same quantity.
 
 The empirical calibration ranges used by the original application are
 
-$0\\le Bd_s/(Ld_{50})\\le7.08$
+$0\\le Bd_s/(L_0d_{50})\\le7.08$
 
 and
 
@@ -221,9 +225,9 @@ Results outside these ranges are flagged and should not be relied upon without f
 
 $R^*=R_c/H$
 
-and dimensionless effective array width
+and dimensionless effective array width. The incident deep-water wavelength is calculated from period:
 
-$b^*=0.6B/\\sqrt{HL}$.
+$L_0=\\frac{gT^2}{2\\pi},\\qquad b^*=0.6B/\\sqrt{HL_0}$.
 
 For $R^*\\le0.4$:
 
