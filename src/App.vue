@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import LinearWaveCalculator from './calculators/waves/linear-wave/LinearWaveCalculator.vue'
 import ShoalingRefractionCalculator from './calculators/waves/shoaling-refraction/ShoalingRefractionCalculator.vue'
 import StokesDriftCalculator from './calculators/waves/stokes-drift/StokesDriftCalculator.vue'
@@ -13,10 +13,14 @@ import ResourcesPage from './pages/ResourcesPage.vue'
 import ExtremeWavesCalculator from './calculators/waves/extreme-waves/ExtremeWavesCalculator.vue'
 import EurotopCalculator from './calculators/engineering/eurotop/EurotopCalculator.vue'
 import BattjesGroenendijkCalculator from './calculators/waves/battjes-groenendijk/BattjesGroenendijkCalculator.vue'
+import ValidationNotice from './components/ValidationNotice.vue'
+import { trackCalculatorView } from './analytics'
 
 type CalculatorId = 'home' | 'resources' | 'theory-selection' | 'linear-wave' | 'extreme-waves' | 'battjes-groenendijk' | 'shoaling-refraction' | 'stokes-drift' | 'wind-holthuijsen' | 'wind-carter' | 'cyclone-waves' | 'eurotop-smooth' | 'eurotop-rubble' | 'eurotop-vertical' | RemainingId
 const activeCalculator = ref<CalculatorId>('home')
 const menusSuppressed = ref(false)
+const titles:Partial<Record<CalculatorId,string>>={'home':'Marine Calculators','resources':'Resources','linear-wave':'Linear Wave Theory','theory-selection':'Nonlinear Regular Wave Theory','extreme-waves':'Extreme Individual Waves','battjes-groenendijk':'Shallow-Water Wave Heights','shoaling-refraction':'Wave Shoaling and Refraction','stokes-drift':'Stokes Drift','wind-holthuijsen':'Wind Waves - Holthuijsen','wind-carter':'Wind Waves - Carter','cyclone-waves':'Cyclone Waves','eurotop-smooth':'EurOtop Dikes and Embankment Seawalls','eurotop-rubble':'EurOtop Armoured Rubble Slopes and Mounds','eurotop-vertical':'EurOtop Plain Vertical and Steep Walls'}
+const activeTitle=computed(()=>titles[activeCalculator.value]??activeCalculator.value.split('-').map(x=>x[0].toUpperCase()+x.slice(1)).join(' '))
 
 function selectCalculator(id: CalculatorId) {
   activeCalculator.value = id
@@ -24,6 +28,16 @@ function selectCalculator(id: CalculatorId) {
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   window.scrollTo({ top: 200, behavior: 'smooth' })
 }
+function updateMetadata(id:CalculatorId){
+  const title=activeTitle.value
+  document.title=`${title}${id==='home'?'':' | Marine Calculators'}`
+  const description=id==='home'?'Transparent, browser-based coastal and marine engineering calculators with equations, graphs and applicability guidance.':`${title}: an interactive coastal and marine engineering calculator with equations, graphs and applicability guidance.`
+  document.querySelector('meta[name="description"]')?.setAttribute('content',description)
+  history.replaceState(null,'',`#${id}`)
+  trackCalculatorView(id,title)
+}
+watch(activeCalculator,id=>updateMetadata(id))
+onMounted(()=>{const id=location.hash.slice(1) as CalculatorId;if(id)activeCalculator.value=id;updateMetadata(activeCalculator.value);window.addEventListener('hashchange',()=>{const next=location.hash.slice(1) as CalculatorId;if(next)activeCalculator.value=next})})
 </script>
 
 <template>
@@ -75,6 +89,7 @@ function selectCalculator(id: CalculatorId) {
   </header>
 
   <main>
+    <ValidationNotice v-if="activeCalculator!=='home'&&activeCalculator!=='resources'" :calculator-id="activeCalculator" @resources="selectCalculator('resources')" />
     <HomePage v-if="activeCalculator === 'home'" />
     <ResourcesPage v-else-if="activeCalculator === 'resources'" />
     <TheorySelectionCalculator v-else-if="activeCalculator === 'theory-selection'" />

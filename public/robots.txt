@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dgreer1.github.io/marine_calculators_web/sitemap.xml

@@ -148,6 +148,15 @@ input:focus, select:focus { outline: 2px solid rgb(0 123 255 / 18%); border-colo
 .resource-card h2 { margin: -48px 0 24px; color: #fff; font-size: 1rem; font-weight: 400; }
 .resource-card p { min-height: 42px; margin: 0 0 14px; font-size: .84rem; line-height: 1.5; }
 .resource-card a { font-size: .84rem; font-weight: 700; }
+.validation-notice { max-width: 1492px; margin: 18px auto -20px; padding: 10px 13px; display: flex; align-items: center; gap: 10px; border-left: 4px solid; font-size: .76rem; line-height: 1.4; }
+.validation-notice strong { flex: 0 0 auto; }
+.validation-notice button { margin-left: auto; padding: 4px 7px; border: 0; color: #176a94; background: transparent; cursor: pointer; text-decoration: underline; }
+.validation-reference { border-color: #2f8f5f; background: #edf8f1; }
+.validation-formula { border-color: #c88a17; background: #fff8e9; }
+.validation-limited { border-color: #c83f34; background: #fff0ee; }
+.validation-register { max-width: 980px; margin-top: 34px; padding: 18px; border: 1px solid #338fbd; font-size: .84rem; line-height: 1.55; }
+.validation-register h2 { margin: 0 0 8px; font-size: 1.2rem; font-weight: 400; }.validation-register h3 { margin: 20px 0 5px; font-size: .92rem; }.validation-register p { margin: 0 0 10px; }
+.validation-key { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }.validation-key span { padding: 5px 8px; border-left: 4px solid; font-size: .74rem; font-weight: 700; }
 footer { display: flex; justify-content: space-between; gap: 30px; padding: 25px max(24px, calc((100vw - 1492px) / 2)); color: #666; background: #f6f6f6; border-top: 1px solid #ddd; font-size: .75rem; }
 footer p { margin: 0; }
 @media (max-width: 1150px) { .calculator-grid { grid-template-columns: 1fr 1fr; } .charts-panel { grid-column: 1 / -1; } }
@@ -164,6 +173,7 @@ footer p { margin: 0; }
   .charts-panel { grid-column: auto; }
   .select-row { padding: 5px 0 15px; }
   .resource-list { grid-template-columns: 1fr; }
+  .validation-notice { margin: 14px 14px -14px; align-items: flex-start; flex-wrap: wrap; }.validation-notice button { margin-left: 0; }
   .eurotop-graphical { grid-template-columns: 1fr; }
   .nav-subdropdown { position: static; min-width: 245px; border-width: 1px 0 0; box-shadow: none; }
   .profile-card-header { align-items: flex-start; }

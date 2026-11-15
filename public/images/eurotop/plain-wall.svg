@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430" role="img" aria-labelledby="title desc">
+  <title id="title">Plain vertical wall overtopping geometry</title>
+  <desc id="desc">Still water, seabed and a plain vertical wall showing wave height Hm0, toe depth h and crest freeboard Rc.</desc>
+  <defs><linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d9edf5"/><stop offset="1" stop-color="#87b8ca"/></linearGradient></defs>
+  <rect width="900" height="430" fill="#fffdf3"/>
+  <rect x="55" y="190" width="650" height="170" fill="url(#water)"/>
+  <path d="M55 190 C115 190 125 125 190 190 S280 255 345 190 S435 125 500 190" fill="none" stroke="#557982" stroke-width="5"/>
+  <rect x="55" y="360" width="650" height="45" fill="#b78655"/>
+  <rect x="705" y="78" width="135" height="327" fill="#9aa3aa" stroke="#515960" stroke-width="4"/>
+  <line x1="55" y1="190" x2="840" y2="190" stroke="#3d5962" stroke-width="2" stroke-dasharray="9 7"/>
+  <line x1="650" y1="190" x2="650" y2="360" stroke="#333" stroke-width="3"/>
+  <path d="M642 202l8-12 8 12M642 348l8 12 8-12" fill="none" stroke="#333" stroke-width="3"/>
+  <text x="630" y="282" font-family="Arial" font-size="30" font-style="italic">h</text>
+  <line x1="775" y1="78" x2="775" y2="190" stroke="#333" stroke-width="3"/>
+  <path d="M767 90l8-12 8 12M767 178l8 12 8-12" fill="none" stroke="#333" stroke-width="3"/>
+  <text x="790" y="143" font-family="Arial" font-size="27" font-style="italic">R<tspan baseline-shift="sub" font-size="18">c</tspan></text>
+  <line x1="305" y1="135" x2="305" y2="245" stroke="#333" stroke-width="3"/>
+  <path d="M297 147l8-12 8 12M297 233l8 12 8-12" fill="none" stroke="#333" stroke-width="3"/>
+  <text x="320" y="181" font-family="Arial" font-size="27" font-style="italic">H<tspan baseline-shift="sub" font-size="18">m0</tspan></text>
+  <text x="60" y="180" font-family="Arial" font-size="20">still water level</text>
+  <text x="566" y="397" font-family="Arial" font-size="20">seabed</text>
+  <text x="728" y="55" font-family="Arial" font-size="22">plain wall</text>
+</svg>

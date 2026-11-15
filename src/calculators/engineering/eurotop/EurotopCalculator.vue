@@ -13,7 +13,7 @@ const values=reactive({approach:'design' as EurotopApproach,hm0:2,period:8,rc:2.
 const vary=ref<'rc'|'hm0'|'period'>('rc')
 const title=computed(()=>props.family==='smooth'?'Dikes and Embankment Seawalls':props.family==='rubble'?'Armoured Rubble Slopes and Mounds':'Vertical and Steep Walls')
 const section=computed(()=>props.family==='smooth'?'Section 5':props.family==='rubble'?'Section 6':'Section 7')
-const image=computed(()=>`images/eurotop/${props.family==='smooth'?'smooth-slope':props.family==='rubble'?'rubble-mound':'composite-wall'}.png`)
+const image=computed(()=>`images/eurotop/${props.family==='smooth'?'smooth-slope.png':props.family==='rubble'?'rubble-mound.png':'plain-wall.svg'}`)
 function calculate(overrides:Partial<typeof values>={}){
   const v={...values,...overrides}
   if(props.family==='smooth')return smoothOvertopping(v.hm0,v.period,v.rc,v.cotAlpha,v.gammaB,v.gammaF,obliquityFactor(v.beta,v.shortCrested),v.gammaV,v.approach)
@@ -56,8 +56,8 @@ onMounted(async()=>{await nextTick();const el=document.querySelector('.eurotop-b
           <label class="check-label"><input v-model="values.permeableCore" type="checkbox" /> Permeable core <button class="info-tip" type="button" data-tip="A permeable core allows internal flow and imposes a lower maximum relative run-up than an impermeable core in Equation 6.2.">i</button></label>
         </template>
         <template v-else>
-          <label>Water Depth at Wall Toe, h (m) <button class="info-tip" type="button" data-tip="Still-water depth immediately in front of the wall or toe mound. With an influencing foreshore it controls whether wave attack is impulsive.">i</button><input v-model.number="values.depth" type="number" min=".05" step="any" /></label>
-          <label class="check-label"><input v-model="values.influencingForeshore" type="checkbox" /> Influencing foreshore <button class="info-tip" type="button" data-tip="Select this when the foreshore changes the waves at the wall. The calculator then classifies attack using h²/(Hm0 Lm-1,0). Leave clear for deep water at the wall with no foreshore influence.">i</button></label>
+          <label>Water Depth at Wall Toe, h (m) <button class="info-tip" type="button" data-tip="Still-water depth immediately in front of a plain wall. EurOtop uses h to classify impulsive attack. The separate symbol d is the depth above a significant toe mound and belongs to the composite-wall method, which is not included here.">i</button><input v-model.number="values.depth" type="number" min=".05" step="any" /></label>
+          <label class="check-label"><input v-model="values.influencingForeshore" type="checkbox" /> Influencing foreshore <button class="info-tip" type="button" data-tip="Select this when a shallow or sloping seabed transforms the waves before they reach the wall through shoaling, steepening or breaking. EurOtop suggests shallow/intermediate water at the toe and a foreshore around 1:50 or steeper as practical indicators; a deep, nearly horizontal approach is normally not influencing.">i</button></label>
         </template>
         <template v-if="family!=='vertical'">
           <label>Wave Angle, β (degrees) <button class="info-tip" type="button" data-tip="Angle between the incident wave direction and a line normal to the structure. Zero degrees is perpendicular attack.">i</button><input v-model.number="values.beta" type="number" min="0" max="80" step="1" /></label>
@@ -79,7 +79,7 @@ onMounted(async()=>{await nextTick();const el=document.querySelector('.eurotop-b
       <article class="panel charts-panel"><div class="panel-title graphical-title"><h2>Graphical</h2></div><div class="graphical-body eurotop-graphical">
         <PlotlyChart :data="chartData" :layout="chartLayout" />
         <div class="select-row eurotop-controls"><label>Vary Input<select v-model="vary"><option value="rc">Crest freeboard</option><option value="hm0">Wave height</option><option value="period">Wave period</option></select></label></div>
-        <figure class="structure-figure"><img class="structure-diagram" :src="image" :alt="`${title} geometry`" /><figcaption>Representative EurOtop geometry and parameter definitions.</figcaption></figure>
+        <figure class="structure-figure"><img class="structure-diagram" :src="image" :alt="`${title} geometry`" /><figcaption>{{ family==='vertical'?'Plain-wall geometry implemented by this calculator.':'Representative EurOtop geometry and parameter definitions.' }}</figcaption></figure>
       </div></article>
     </div>
     <article class="background-panel"><div class="background-title"><h2>Background, equation selection and applicability</h2><span>−</span></div><div class="background-body eurotop-background">
@@ -104,7 +104,8 @@ onMounted(async()=>{await nextTick();const el=document.querySelector('.eurotop-b
         <p>Run-up is capped at $R_{u2\%}/H_{m0}=3.0$ for an impermeable core and 2.0 for a permeable core (3.21 and 2.14 for design). Equation 6.3 assumes that crossing the run-up level is equivalent to overtopping. EurOtop warns that it therefore overestimates waves actually passing a crest berm or crown wall.</p>
       </template>
       <template v-else>
-        <h3>Vertical and steep walls</h3><p>Without an influencing foreshore, the mean-value plain-wall expression is:</p><div class="equation">$$\frac{q}{\sqrt{gH_{m0}^{3}}}=0.047\exp\left[-\left(2.35\frac{R_c}{H_{m0}}\right)^{1.3}\right]$$</div>
+        <h3>Vertical and steep walls</h3><p><strong>Scope:</strong> this calculator implements EurOtop's <em>plain wall</em> procedure. In EurOtop figures, $h$ is the water depth in front of the wall toe and $d$ is the depth above a significant berm or toe mound. Composite walls require both $h$ and $d$ and use a different classifier, $hd/(H_{m0}L_{m-1,0})$; that method is not yet implemented here, so $d$ is deliberately not requested.</p><p>Without an influencing foreshore, the mean-value plain-wall expression is:</p><div class="equation">$$\frac{q}{\sqrt{gH_{m0}^{3}}}=0.047\exp\left[-\left(2.35\frac{R_c}{H_{m0}}\right)^{1.3}\right]$$</div>
+        <p>An <strong>influencing foreshore</strong> is not simply any seabed in front of the wall. It is a shallow or sloping approach that materially changes wave height and shape through shoaling, steepening or breaking before the wave reaches the wall. EurOtop describes shallow/intermediate water at the toe and a foreshore around 1:50 or steeper as practical indicators. Harbour walls in relatively deep water, with waves small compared with depth, are typical non-influencing cases.</p>
         <p>Where a foreshore influences the wall, the impulse parameter separates non-impulsive and impulsive attack:</p><div class="equation">$$I=\frac{h^2}{H_{m0}L_{m-1,0}},\qquad I>0.23\;\text{non-impulsive},\quad I\leq0.23\;\text{impulsive}$$</div>
         <p>For non-impulsive attack the mean-value relationship is:</p><div class="equation">$$\frac{q}{\sqrt{gH_{m0}^{3}}}=0.05\exp\left(-2.78\frac{R_c}{H_{m0}}\right)$$</div>
         <p>Impulsive attack uses an exponential branch for $R_c/H_{m0}<1.35$ and an inverse-cube branch above that threshold. The output identifies the selected equation. Design coefficients are taken from Equations 7.2, 7.6, 7.9 and 7.10.</p>
