@@ -2,6 +2,7 @@
 import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import renderMathInElement from 'katex/contrib/auto-render'
 import 'katex/dist/katex.min.css'
+import type { Layout } from 'plotly.js'
 import PlotlyChart from '../../../components/PlotlyChart.vue'
 import { linspace } from '../../../engineering/numeric'
 import { obliquityFactor, roughnessCatalogue, rubbleOvertopping, smoothOvertopping, verticalOvertopping, type EurotopApproach, type EurotopFamily } from '../../../engineering/eurotop'
@@ -27,7 +28,7 @@ const chartData=computed(()=>[
   {x:[values[vary.value]],y:[result.value.q*1000],type:'scatter' as const,mode:'markers' as const,marker:{color:'#111',size:9},hovertemplate:'Current case<br>%{y:.3g} L/s/m<extra></extra>'},
 ])
 const varyLabel=computed(()=>vary.value==='rc'?'Crest freeboard, Rc (m)':vary.value==='hm0'?'Wave height, Hm0 (m)':'Wave period, Tm-1,0 (s)')
-const chartLayout=computed(()=>({xaxis:{title:{text:varyLabel.value}},yaxis:{title:{text:'Mean discharge, q (L/s/m)'},type:'log'},showlegend:false,shapes:transitions.value.map(t=>({type:'line',xref:'x',yref:'paper',x0:t.x,x1:t.x,y0:0,y1:1,line:{color:'#8b3a3a',width:1.5,dash:'dash'}})),annotations:transitions.value.map((t,i)=>({xref:'x',yref:'paper',x:t.x,y:1,xanchor:i%2?'right':'left',yanchor:'bottom',text:`${t.label}<br><span style="font-size:10px">Eq. ${t.equations}</span>`,showarrow:false,font:{size:10,color:'#6d2424'},bgcolor:'rgba(255,255,255,.85)',borderpad:2}))}))
+const chartLayout=computed<Partial<Layout>>(()=>({xaxis:{title:{text:varyLabel.value}},yaxis:{title:{text:'Mean discharge, q (L/s/m)'},type:'log'},showlegend:false,shapes:transitions.value.map(t=>({type:'line',xref:'x',yref:'paper',x0:t.x,x1:t.x,y0:0,y1:1,line:{color:'#8b3a3a',width:1.5,dash:'dash'}})),annotations:transitions.value.map((t,i)=>({xref:'x',yref:'paper',x:t.x,y:1,xanchor:i%2?'right':'left',yanchor:'bottom',text:`${t.label}<br><span style="font-size:10px">Eq. ${t.equations}</span>`,showarrow:false,font:{size:10,color:'#6d2424'},bgcolor:'rgba(255,255,255,.85)',borderpad:2}))}))
 const armour=ref('Rock, 2 layers, permeable core')
 function setArmour(){values.gammaF=roughnessCatalogue[armour.value]}
 onMounted(async()=>{await nextTick();const el=document.querySelector('.eurotop-background');if(el)renderMathInElement(el as HTMLElement,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})})

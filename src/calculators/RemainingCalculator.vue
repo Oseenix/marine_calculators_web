@@ -4,6 +4,7 @@ import renderMathInElement from 'katex/contrib/auto-render'
 import PlotlyChart from '../components/PlotlyChart.vue'
 import InfoTip from '../components/InfoTip.vue'
 import { linspace } from '../engineering/numeric'
+import { deepWaterWavelength } from '../engineering/waves/linearWave'
 import { beachSlope, bedShear, criticalSediment, enclosedWindSetup, fallVelocity, fringeSetup, overtopping, planarSetup, reefBallTransmission, rockSizing, sedimentDensity, submergedTransmission } from '../engineering/remaining'
 import { downloadRemainingWorkbook, supportsRemainingWorkbook } from '../export/remainingWorkbooks'
 
