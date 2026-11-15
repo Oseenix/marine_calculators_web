@@ -83,8 +83,10 @@ onMounted(()=>{const id=location.hash.slice(1) as CalculatorId;if(id)activeCalcu
           <button type="button" @click="selectCalculator('eurotop-rubble')">Armoured Rubble Slopes and Mounds</button>
           <button type="button" @click="selectCalculator('eurotop-vertical')">Vertical and Steep Walls</button>
         </div></div>
-        <button type="button" @click="selectCalculator('submerged-breakwater')">Transmission over Submerged Breakwater</button>
-        <button type="button" @click="selectCalculator('reef-balls')">Transmission over Reef Balls</button>
+        <div class="nav-folder"><button type="button">Wave Transmission <span>▸</span></button><div class="nav-subdropdown">
+          <button type="button" @click="selectCalculator('submerged-breakwater')">Submerged Breakwater</button>
+          <button type="button" @click="selectCalculator('reef-balls')">Reef Balls</button>
+        </div></div>
       </div></div>
       <button class="nav-link" :class="{ active: activeCalculator === 'resources' }" type="button" @click="selectCalculator('resources')">Resources</button>
     </nav>
