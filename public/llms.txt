@@ -2,7 +2,7 @@
 
 Marine Calculators is a free, browser-based collection of transparent coastal and marine engineering calculation tools. Each calculator exposes its input definitions, outputs, equations, applicability notes and validation status.
 
-Main site: https://rippleforecast.com/calculator/
+Main site: https://dgreer1.github.io/marine_calculators_web/
 
 Core topics include linear and nonlinear regular wave theory, shallow-water wave statistics, shoaling and refraction, Stokes drift, wind and cyclone waves, sediment fall velocity and mobilisation, wave setup and run-up, EurOtop 2018 overtopping, armour rock sizing, and wave transmission.
 

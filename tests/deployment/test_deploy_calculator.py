@@ -60,7 +60,7 @@ class TemporaryRoots(unittest.TestCase):
         self.root = Path(self.temporary.name)
         self.current = self.root / "calculator"
         self.releases = self.root / "calculator-releases"
-        self.current.mkdir()
+        self.current.mkdir(mode=0o755)
         (self.current / "index.html").write_bytes(b"original R Shinylive index")
         (self.current / "unrelated-R-data").write_bytes(b"keep me")
 

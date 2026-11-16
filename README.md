@@ -49,23 +49,43 @@ saved in namespaced local storage and may be reset or exported as versioned JSON
 
 ## Deployment
 
-`.github/workflows/deploy-ocean.yml` runs tests and production builds on pull
-requests, pushes to `main`, and manual runs. Only a pushed `v*` tag deploys to
-<https://rippleforecast.com/calculator/>. The tagged commit must belong to `main`
-history. Manual runs do not deploy. Deployments are serialized and never cancelled
-mid-transfer.
+`.github/workflows/deploy-pages.yml` preserves GitHub Pages deployment on `main`
+and runs tests for pull requests. The default build base is
+`/marine_calculators_web/`; the default public URL is the upstream Pages URL.
+Set `VITE_BASE_PATH` and `VITE_SITE_URL` to build for another host. The build
+updates entry-page metadata, `robots.txt`, `sitemap.xml`, and `llms.txt` together.
+`VITE_SITE_URL` must include a trailing slash.
+
+`.github/workflows/deploy-ocean.yml` is an optional, independent release workflow.
+Set repository variable `OCEAN_DEPLOY_ENABLED=true` to enable it. Only a pushed
+`v*` tag deploys to <https://rippleforecast.com/calculator/>; manual runs test and
+build without deploying. The tagged commit must belong to `main` history.
+Deployments are serialized and never cancelled mid-transfer.
 
 Node.js 24 and pnpm are build-time dependencies only. Ocean serves `dist/` with
 Nginx; no Node.js process, database, or changes to the main wave application are
-required. Vite's base path is `/calculator/`.
+required. The ocean workflow explicitly builds with `/calculator/` and the ocean
+public URL; it does not change Pages build settings.
 
 ### Release configuration
 
-The GitHub environment `ocean` allows only `v*` tags and contains:
+Configure these repository-level settings in the repository publishing tags:
 
+- Variable `OCEAN_DEPLOY_ENABLED`: `true` to opt in; unset disables ocean jobs.
 - Variable `OCEAN_HOST`: Ocean SSH address, port 22.
 - Secret `OCEAN_SSH_PRIVATE_KEY`: Dedicated `marine-deploy` Ed25519 key.
 - Secret `OCEAN_KNOWN_HOSTS`: Pinned host key verified through existing SSH access.
+
+The deploy job references environment `ocean` for deployment tracking. An
+administrator should create it ahead of time, allow only `v*` tags, and move the
+two secrets there if environment-scoped protection is required. Otherwise GitHub
+creates the environment on its first deployment, without protection rules.
+Repository-level secrets are accessible to other workflows with the necessary
+permissions; merely marking this workflow tag-only is not a security boundary.
+
+Protect release tags: allow only trusted publishers to create `v*`, and disallow
+tag updates and deletion. Each repository should have a distinct restricted
+deployment key so access can be revoked independently.
 
 The optional repository variable `VITE_GA_MEASUREMENT_ID` enables analytics.
 Never put private credentials in `VITE_*` variables: they are included in browser
