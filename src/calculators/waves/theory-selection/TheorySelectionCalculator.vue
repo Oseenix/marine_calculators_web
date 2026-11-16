@@ -4,16 +4,12 @@ import { computed, nextTick, onMounted, ref } from 'vue'
 import PlotlyChart from '../../../components/PlotlyChart.vue'
 import InfoTip from '../../../components/InfoTip.vue'
 import { chooseTheoryFromDimensionless, chooseWaveTheory } from '../../../engineering/waves/theorySelection'
-import { solveFourier, type FourierSolution } from '../../../engineering/waves/fourierSolver'
 
 const waveHeight = ref(2)
 const wavePeriod = ref(10)
 const waterDepth = ref(10)
 const error = computed(() => waveHeight.value < 0 || wavePeriod.value <= 0 || waterDepth.value <= 0 ? 'Wave height must be non-negative; period and depth must be greater than zero.' : '')
 const result = computed(() => error.value ? null : chooseWaveTheory({ waveHeight: waveHeight.value, wavePeriod: wavePeriod.value, waterDepth: waterDepth.value }))
-const fourierSolution=ref<FourierSolution|null>(null);const solverBusy=ref(false);const solverError=ref('')
-async function runFourier(){if(error.value)return;solverBusy.value=true;solverError.value='';try{fourierSolution.value=await solveFourier({waveHeight:waveHeight.value,wavePeriod:wavePeriod.value,waterDepth:waterDepth.value,components:20,heightSteps:1})}catch(e){fourierSolution.value=null;solverError.value=e instanceof Error?e.message:String(e)}finally{solverBusy.value=false}}
-
 const axis = Array.from({ length: 150 }, (_, i) => 10 ** (-4 + i * 3.1 / 149))
 const depthAxis = Array.from({ length: 160 }, (_, i) => 10 ** (-3 + i * 2.45 / 159))
 const zones = axis.map(y => depthAxis.map(x => {
@@ -56,13 +52,6 @@ const profileData = computed(() => [
   { x: [-.5, 1.5], y: [0, 0], type: 'scatter' as const, mode: 'lines' as const, line: { color: '#777', width: 1, dash: 'dash' as const }, hoverinfo: 'skip' as const },
 ])
 const profileLayout = { xaxis: { title: { text: 'Position through the wave, x/L' }, range: [-.5, 1.5] }, yaxis: { title: { text: 'Normalised surface elevation' }, fixedrange: true }, showlegend: false, margin: { t: 12, b: 55, l: 62, r: 18 } }
-const fourierSurfaceData=computed(()=>fourierSolution.value?[{x:fourierSolution.value.surface.map(p=>p.x),y:fourierSolution.value.surface.map(p=>p.elevation),type:'scatter' as const,mode:'lines' as const,line:{color:'#0879bd',width:3},hovertemplate:'x = %{x:.2f} m<br>η = %{y:.3f} m<extra></extra>'}]:[])
-const fourierSpectrumData=computed(()=>fourierSolution.value?[{x:fourierSolution.value.coefficients.map(p=>p.harmonic),y:fourierSolution.value.coefficients.map(p=>Math.abs(p.surface)),type:'bar' as const,marker:{color:'#7040a1'},hovertemplate:'Harmonic %{x}<br>|aₙ| = %{y:.4g} m<extra></extra>'}]:[])
-const fourierVelocityData=computed(()=>fourierSolution.value?[{x:fourierSolution.value.flow.map(p=>p.x),y:fourierSolution.value.flow.map(p=>p.y),type:'scattergl' as const,mode:'markers' as const,marker:{size:10,color:fourierSolution.value.flow.map(p=>p.u),colorscale:'RdBu',reversescale:true,showscale:true,colorbar:{title:{text:'u (m/s)'}}},hovertemplate:'x = %{x:.2f} m<br>y = %{y:.2f} m<br>u = %{marker.color:.3f} m/s<extra></extra>'}]:[])
-const surfaceLayout={xaxis:{title:{text:'Horizontal position, x (m)'}},yaxis:{title:{text:'Surface elevation, η (m)'}},showlegend:false}
-const spectrumLayout={xaxis:{title:{text:'Harmonic number'}},yaxis:{title:{text:'Surface amplitude (m)'},type:'log' as const},showlegend:false}
-const velocityLayout={xaxis:{title:{text:'Horizontal position, x (m)'}},yaxis:{title:{text:'Height above bed, y (m)'}},showlegend:false}
-
 onMounted(async () => {
   await nextTick()
   const el = document.querySelector('.theory-background') as HTMLElement | null
@@ -102,7 +91,7 @@ onMounted(async () => {
         <div class="graphical-body">
           <PlotlyChart :data="chartData" :layout="chartLayout" />
           <div class="theory-key" aria-label="Applicability-map key"><span class="linear">Airy</span><span class="stokes">Stokes</span><span class="cnoidal">Cnoidal</span><span class="fourier">Fourier / stream function</span><span class="breaking">Breaking region</span></div>
-          <p class="map-note"><strong>How to read this map:</strong> the colours show which description is most informative—not the only method that can calculate the case. The Fenton Fourier/stream-function solver below is used across the Airy, Stokes, cnoidal and purple regions, provided the wave is regular and non-breaking.</p>
+          <p class="map-note"><strong>How to read this map:</strong> the colours show which theoretical description is generally most informative for the entered wave conditions. The boundaries are guides rather than abrupt physical changes.</p>
         </div>
       </article>
     </div>
@@ -124,18 +113,6 @@ onMounted(async () => {
           <p>Normalised schematic profile for comparison—not calculated solver output.</p>
         </div>
       </div>
-    </section>
-
-    <section class="fourier-lab" aria-labelledby="fourier-lab-title">
-      <div class="fourier-lab-heading"><div><h2 id="fourier-lab-title">Experimental Fenton Fourier / stream-function solver</h2><p>Adapted from John Fenton's nonlinear C++ solver.</p></div><button type="button" :disabled="solverBusy || !!error" @click="runFourier">{{ solverBusy ? 'Solving…' : 'Run Fourier model' }}</button></div>
-      <p class="solver-range"><strong>One numerical method across the map:</strong> this is the only nonlinear solver currently implemented on this page. It can calculate regular, non-breaking waves across the ranges commonly described by Airy, Stokes and cnoidal theories; those names remain useful for understanding the dominant wave behaviour.</p>
-      <p class="solver-notice">Experimental public preview. Results should be independently checked. Original method and program © John D. Fenton; redistribution permission is being sought.</p>
-      <p v-if="solverError" class="solver-error">{{ solverError }}</p>
-      <template v-if="fourierSolution">
-        <dl class="fourier-summary"><div><dt>Nonlinear wavelength <button class="info-tip" type="button" aria-label="About nonlinear wavelength" data-tip="The crest-to-crest distance calculated while satisfying the nonlinear wave equations. It may differ slightly from the Airy-theory wavelength.">i</button></dt><dd>{{ fourierSolution.wavelength.toFixed(2) }} m</dd></div><div><dt>Wave celerity <button class="info-tip" type="button" aria-label="About wave celerity" data-tip="The speed at which a wave crest and its regular wave form travel.">i</button></dt><dd>{{ fourierSolution.celerity.toFixed(2) }} m/s</dd></div><div><dt>Stokes–Ursell number <button class="info-tip" type="button" aria-label="About the Stokes Ursell number" data-tip="Fenton's scaled form of the Ursell number. A value near 0.5 is an approximate boundary between the ranges normally associated with Stokes and cnoidal expansions.">i</button></dt><dd>{{ fourierSolution.stokesUrsell.toFixed(3) }}</dd></div><div><dt>Fraction of limiting height <button class="info-tip" type="button" aria-label="About fraction of limiting height" data-tip="The calculated wave height as a percentage of an estimated maximum steady-wave height. Approaching 100% signals a near-limiting wave and requires particular caution.">i</button></dt><dd>{{ fourierSolution.heightFractionOfMaximum.toFixed(0) }}%</dd></div></dl>
-        <div class="fourier-graphs"><article><h3>Nonlinear free surface</h3><PlotlyChart :data="fourierSurfaceData" :layout="surfaceLayout" /></article><article><h3>Harmonic spectrum</h3><PlotlyChart :data="fourierSpectrumData" :layout="spectrumLayout" /></article><article class="velocity-graph"><h3>Horizontal velocity field</h3><PlotlyChart :data="fourierVelocityData" :layout="velocityLayout" /></article></div>
-      </template>
-      <div v-else-if="!solverBusy" class="solver-empty">Run the model to calculate the nonlinear wave profile, harmonic content and subsurface velocity field for the current inputs.</div>
     </section>
 
     <article class="background-panel">
