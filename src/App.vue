@@ -6,7 +6,6 @@ import StokesDriftCalculator from './calculators/waves/stokes-drift/StokesDriftC
 import WindHolthuijsenCalculator from './calculators/waves/wind-holthuijsen/WindHolthuijsenCalculator.vue'
 import WindCarterCalculator from './calculators/waves/wind-carter/WindCarterCalculator.vue'
 import CycloneWavesCalculator from './calculators/waves/cyclone-waves/CycloneWavesCalculator.vue'
-import TheorySelectionCalculator from './calculators/waves/theory-selection/TheorySelectionCalculator.vue'
 import RemainingCalculator, { type RemainingId } from './calculators/RemainingCalculator.vue'
 import HomePage from './pages/HomePage.vue'
 import ResourcesPage from './pages/ResourcesPage.vue'
@@ -15,10 +14,10 @@ import EurotopCalculator from './calculators/engineering/eurotop/EurotopCalculat
 import BattjesGroenendijkCalculator from './calculators/waves/battjes-groenendijk/BattjesGroenendijkCalculator.vue'
 import { trackCalculatorView } from './analytics'
 
-type CalculatorId = 'home' | 'resources' | 'theory-selection' | 'linear-wave' | 'extreme-waves' | 'battjes-groenendijk' | 'shoaling-refraction' | 'stokes-drift' | 'wind-holthuijsen' | 'wind-carter' | 'cyclone-waves' | 'eurotop-smooth' | 'eurotop-rubble' | 'eurotop-vertical' | RemainingId
+type CalculatorId = 'home' | 'resources' | 'linear-wave' | 'extreme-waves' | 'battjes-groenendijk' | 'shoaling-refraction' | 'stokes-drift' | 'wind-holthuijsen' | 'wind-carter' | 'cyclone-waves' | 'eurotop-smooth' | 'eurotop-rubble' | 'eurotop-vertical' | RemainingId
 const activeCalculator = ref<CalculatorId>('home')
 const menusSuppressed = ref(false)
-const titles:Partial<Record<CalculatorId,string>>={'home':'Marine Calculators','resources':'Resources','linear-wave':'Linear Wave Theory','theory-selection':'Nonlinear Regular Wave Theory','extreme-waves':'Extreme Individual Waves','battjes-groenendijk':'Shallow-Water Wave Heights','shoaling-refraction':'Wave Shoaling and Refraction','stokes-drift':'Stokes Drift','wind-holthuijsen':'Wind Waves - Holthuijsen','wind-carter':'Wind Waves - Carter','cyclone-waves':'Cyclone Waves','wave-setup':'Wave Run-up and Setup on Beaches','fringe-setup':'Wind and Wave Setup on a Fringing Reef','wind-setup':'Wind Setup in an Enclosed Water Body','eurotop-smooth':'EurOtop Dikes and Embankment Seawalls','eurotop-rubble':'EurOtop Armoured Rubble Slopes and Mounds','eurotop-vertical':'EurOtop Plain Vertical and Steep Walls'}
+const titles:Partial<Record<CalculatorId,string>>={'home':'Marine Calculators','resources':'Resources','linear-wave':'Linear Wave Theory','extreme-waves':'Extreme Individual Waves','battjes-groenendijk':'Shallow-Water Wave Heights','shoaling-refraction':'Wave Shoaling and Refraction','stokes-drift':'Stokes Drift','wind-holthuijsen':'Wind Waves - Holthuijsen','wind-carter':'Wind Waves - Carter','cyclone-waves':'Cyclone Waves','wave-setup':'Wave Run-up and Setup on Beaches','fringe-setup':'Wind and Wave Setup on a Fringing Reef','wind-setup':'Wind Setup in an Enclosed Water Body','eurotop-smooth':'EurOtop Dikes and Embankment Seawalls','eurotop-rubble':'EurOtop Armoured Rubble Slopes and Mounds','eurotop-vertical':'EurOtop Plain Vertical and Steep Walls'}
 const activeTitle=computed(()=>titles[activeCalculator.value]??activeCalculator.value.split('-').map(x=>x[0].toUpperCase()+x.slice(1)).join(' '))
 
 function selectCalculator(id: CalculatorId) {
@@ -36,7 +35,7 @@ function updateMetadata(id:CalculatorId){
   trackCalculatorView(id,title)
 }
 watch(activeCalculator,id=>updateMetadata(id))
-onMounted(()=>{const id=location.hash.slice(1) as CalculatorId;if(id)activeCalculator.value=id;updateMetadata(activeCalculator.value);window.addEventListener('hashchange',()=>{const next=location.hash.slice(1) as CalculatorId;if(next)activeCalculator.value=next})})
+onMounted(()=>{const raw=location.hash.slice(1);const id=(raw==='theory-selection'?'home':raw) as CalculatorId;if(id)activeCalculator.value=id;updateMetadata(activeCalculator.value);window.addEventListener('hashchange',()=>{const rawNext=location.hash.slice(1);const next=(rawNext==='theory-selection'?'home':rawNext) as CalculatorId;if(next)activeCalculator.value=next})})
 </script>
 
 <template>
@@ -52,7 +51,6 @@ onMounted(()=>{const id=location.hash.slice(1) as CalculatorId;if(id)activeCalcu
         <button class="active" type="button">Waves <span>▾</span></button>
         <div class="nav-dropdown">
           <button type="button" @click="selectCalculator('linear-wave')">Linear Wave Theory</button>
-          <button type="button" @click="selectCalculator('theory-selection')">Nonlinear Regular Wave Theory</button>
           <button type="button" @click="selectCalculator('extreme-waves')">Extreme Individual Waves (Stive, 1986)</button>
           <button type="button" @click="selectCalculator('battjes-groenendijk')">Shallow-Water Wave Heights (Battjes–Groenendijk, 2000)</button>
           <button type="button" @click="selectCalculator('shoaling-refraction')">Wave Shoaling and Refraction</button>
@@ -95,7 +93,6 @@ onMounted(()=>{const id=location.hash.slice(1) as CalculatorId;if(id)activeCalcu
   <main>
     <HomePage v-if="activeCalculator === 'home'" />
     <ResourcesPage v-else-if="activeCalculator === 'resources'" />
-    <TheorySelectionCalculator v-else-if="activeCalculator === 'theory-selection'" />
     <LinearWaveCalculator v-else-if="activeCalculator === 'linear-wave'" />
     <ExtremeWavesCalculator v-else-if="activeCalculator === 'extreme-waves'" @navigate="selectCalculator" />
     <BattjesGroenendijkCalculator v-else-if="activeCalculator === 'battjes-groenendijk'" />
